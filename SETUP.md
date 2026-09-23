@@ -67,7 +67,39 @@ Open http://localhost:8000/docs to see and try every endpoint.
 pytest -q                   # runs all backend tests
 ```
 
-### 3.5 Common errors  [Owner: B]
+### 3.5 Serve the tablet (backend on a laptop, app on an emulator or tablet)
+The person running the backend does this; the app side then follows section 4.3.
+```bash
+cd backend && source .venv/bin/activate
+python -m app.seed                                          # fresh demo data, relative to right now
+uvicorn app.main:app --host 0.0.0.0 --port 8000             # 0.0.0.0 = reachable from other devices, not just this laptop
+ipconfig getifaddr en0                                      # macOS: this laptop's Wi-Fi IP (Windows: ipconfig; Linux: hostname -I)
+```
+Then, from where the app runs:
+
+| App runs on | `API_BASE` to use | Check it (in the device's browser) |
+|---|---|---|
+| Android emulator on the **same laptop** as the backend | `http://10.0.2.2:8000` | http://10.0.2.2:8000/health |
+| Real tablet, or an emulator on **another laptop** | `http://<IP from ipconfig>:8000` (same Wi-Fi) | http://<IP>:8000/health → `{"status":"ok","version":"2.0"}` |
+
+If `/health` doesn't load from the other device: both on the same Wi-Fi (not a guest network that isolates devices), and on macOS click **Allow** when asked "accept incoming network connections" for Python (or System Settings → Network → Firewall).
+
+**What the backend serves today** (so you know what's real vs placeholder):
+
+| Area | Endpoints | Status |
+|---|---|---|
+| Login, operators (hours + rest), machines, jobs, assignments | E2–E7, E9 | ✅ real |
+| Job-time estimate (XGBoost) | E8 | ✅ real |
+| Sessions, checklist + critical-defect gate, briefing | E10–E17 | ✅ real (briefing = template until a Gemini key is set, section 5.1) |
+| Live telemetry WebSocket + scenarios | W1, E21, E22 | ✅ real — `ws://<host>:8000/ws/sessions/{id}`, only while the session is `active` |
+| Incident log (alerts), ack | E18–E20 | ✅ real |
+| Assistant Q&A | E23 | ⏳ placeholder answer until B11 |
+| Cloud TTS / translate (Sarvam) | E24, E25 | ⏳ TTS returns 503 → app uses on-device TTS; translate echoes the text |
+| Training Hub content | E26, E27 | ⏳ one fixed module until B13 |
+
+Errors always come back as `{"error": {"code": "...", "message": "..."}}` — e.g. `409 REST_REQUIRED` (Mohit), `422 CRITICAL_DEFECT` (hose leak), `409 INVALID_STATE` (step out of order). Order of a session: `checklist complete → briefing → start → end`.
+
+### 3.6 Common errors  [Owner: B]
 | Error | Fix |
 |---|---|
 | `chromadb` / embedding model slow on first run | It downloads the embedding model once; let it finish, then it's cached |
@@ -78,36 +110,55 @@ pytest -q                   # runs all backend tests
 
 ## 4. App  [Owner: A]
 
+> Edited by B (2026-09-24, with B's human's OK) to add device selection + APK build. **A: please verify on your machine and adjust freely** — this section stays yours.
+
 ### 4.1 Install
 ```bash
+flutter doctor                 # Flutter + Android toolchain OK (fix anything red first)
 cd app
-flutter pub get             # install Dart packages (incl. google_mlkit_face_detection, speech_to_text, flutter_tts)
+flutter pub get                # install Dart packages (incl. google_mlkit_face_detection, speech_to_text, flutter_tts)
+flutter devices                # your emulator / tablet is listed (real tablet: enable USB debugging, plug in, accept the prompt)
 ```
 
 ### 4.2 Run on mock data (no backend needed)
 ```bash
-flutter run --dart-define=USE_MOCK=true
+flutter run --dart-define=USE_MOCK=true                     # whole app on built-in fake data; camera CV still runs on-device
 ```
 
 ### 4.3 Run against the real backend
+The backend must be running and reachable first — see section 3.5 (host `0.0.0.0`, laptop IP, `/health` check).
 ```bash
-# Emulator: 10.0.2.2 means "the computer running the emulator"
-flutter run --dart-define=USE_MOCK=false --dart-define=API_BASE=http://10.0.2.2:8000
-# Physical tablet: use your laptop's Wi-Fi IP (same network), e.g. http://192.168.1.20:8000
+# Android emulator on the SAME laptop as the backend (10.0.2.2 = "the computer running the emulator"):
+flutter run -d <device-id> --dart-define=USE_MOCK=false --dart-define=API_BASE=http://10.0.2.2:8000
+# Real tablet (or an emulator on another laptop), same Wi-Fi as the backend laptop:
+flutter run -d <device-id> --dart-define=USE_MOCK=false --dart-define=API_BASE=http://<laptop-ip>:8000
+```
+Log in as `op_001` Ravi Kumar, PIN `1234` (all demo logins: section 3.2). `<device-id>` comes from `flutter devices`.
+
+### 4.4 Build an APK to install on the tablet
+`API_BASE` is fixed into the APK when it's built — rebuild if the laptop's IP changes.
+```bash
+flutter build apk --debug --dart-define=USE_MOCK=false --dart-define=API_BASE=http://<laptop-ip>:8000   # builds the installable app
+adb install -r build/app/outputs/flutter-apk/app-debug.apk                                                # installs it on the connected tablet
 ```
 
-### 4.4 Test
+### 4.5 Test
 ```bash
 flutter analyze             # static checks, must be clean
 flutter test                # widget/unit/edge tests
 ```
 
-### 4.5 Common errors  [Owner: both — add rows only]
+### 4.6 Common errors  [Owner: both — add rows only]
 | Error | Fix |
 |---|---|
 | App can't reach backend on emulator | Use `10.0.2.2`, not `localhost` |
 | Cleartext HTTP blocked on Android | Add `android:usesCleartextTraffic="true"` to AndroidManifest (demo only) |
 | Camera permission denied (edge CV) | Grant camera permission; the CV demo needs the front camera |
+| Tablet can't reach the laptop backend | Backend started with `--host 0.0.0.0`; same Wi-Fi; open `http://<laptop-ip>:8000/health` in the tablet browser; allow Python through the macOS firewall (section 3.5) |
+| `409 REST_REQUIRED` when starting a session | Expected for `op_004` Mohit (fatigue demo). Use `op_001` Ravi / PIN 1234 for the main flow |
+| `409 INVALID_STATE` / `SESSION_ALREADY_ACTIVE` | A step was called out of order, or the operator still has an active session — end it (`POST /sessions/{id}/end`) or re-seed (`python -m app.seed`) |
+| `503 UPSTREAM_UNAVAILABLE` from `/voice/tts` | Expected until Sarvam is set up — use on-device `flutter_tts` |
+| Gauges don't react to `POST /sim/scenario` | The app must read the real WebSocket (`ws://<host>:8000/ws/sessions/{id}`), and the session must be `active` (after Start) |
 | _(fill in as you hit them)_ | |
 
 ---
@@ -140,18 +191,40 @@ curl -X POST localhost:8000/voice/tts -H "Content-Type: application/json" \
 ## 6. Run the full stack  [Owner: both]
 
 1. Terminal 1: backend (3.3).
-2. Terminal 2: app against real backend (4.3).
+2. Terminal 2: app against real backend (4.3), or the installed APK (4.4).
 3. Log in, start a session, then trigger scenarios (section 7). Point the tablet camera at a face for the CV alert.
 
 ## 7. Demo scenario triggers  [Owner: B]
 
+Run on the backend laptop once the tablet has **started** the session (state `active`). The session id is shown by the app, or is the latest `ses_NNN` (`curl localhost:8000/sessions/ses_001` … shows each one's state).
 ```bash
+SID=ses_001                                   # the active session
 curl -X POST localhost:8000/sim/scenario -H "Content-Type: application/json" \
-  -d '{"session_id":"<ses_id>","event":"seatbelt_off"}'   # steers telemetry so the TABLET's rule fires the alert
+  -d "{\"session_id\":\"$SID\",\"event\":\"seatbelt_off\"}"   # steers telemetry so the TABLET's rule fires the alert
 ```
-Telemetry events (steer the stream): `normal`, `seatbelt_off`, `proximity`, `excessive_idle`, `overheat`, `overload`, `unsafe_operation`.
-Camera events (`drowsiness`, `distraction`, `operator_absent`) are triggered **live** by a real face in front of the tablet — no curl needed.
 Or use Swagger: `/docs` → `POST /sim/scenario`.
+
+| Event | What the stream does (~15 s, then back to normal) | Tablet rule that should fire |
+|---|---|---|
+| `seatbelt_off` | `seatbelt` → false | seatbelt (critical if moving) |
+| `proximity` | `proximity_m` 9 → 1.5 m | proximity: warning (<5 m), then critical (<2 m) |
+| `overheat` | `hydraulic_temp_c` 88 → 108 °C | overheat: warning (>95), then critical (>105) |
+| `overload` | `load_pct` 85 → 104 % | overload: warning (>90), then critical (>100) |
+| `unsafe_operation` | 18 km/h at 85 % load | unsafe operation |
+| `excessive_idle` | idle, `idle_seconds` 170 → 185 | excessive idle (fires ~10 s in) |
+| `normal` | cancels the running scenario | — |
+
+A new event replaces the one running. Camera events (`drowsiness`, `distraction`, `operator_absent`) are triggered **live** by a real face in front of the tablet — the API accepts them but doesn't change telemetry.
+
+Watch the raw stream on the laptop (optional, handy when the tablet shows nothing):
+```bash
+cd backend && SID=ses_001 .venv/bin/python -c "
+import asyncio, json, os, websockets
+async def main():
+    async with websockets.connect(f'ws://localhost:8000/ws/sessions/{os.environ[\"SID\"]}') as ws:
+        async for m in ws: print(json.loads(m))
+asyncio.run(main())"
+```
 
 ## 8. Fresh-clone check  [Owner: both — B leads at M5]
 
