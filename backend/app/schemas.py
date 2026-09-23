@@ -6,7 +6,12 @@ If this file and CONTRACT.md disagree, this file is wrong.
 from datetime import date, datetime
 from enum import Enum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+
+
+class Schema(BaseModel):
+    # Lets routers build responses straight from SQLModel rows.
+    model_config = ConfigDict(from_attributes=True)
 
 
 # ---------- §2 Enums ----------
@@ -97,23 +102,23 @@ SIM_EVENTS: list[str] = ["normal"] + [t.value for t in AlertType]
 
 # ---------- §4 Schemas ----------
 
-class Health(BaseModel):
+class Health(Schema):
     status: str
     version: str
 
 
-class LoginRequest(BaseModel):
+class LoginRequest(Schema):
     operator_id: str
     pin: str
 
 
-class Rest(BaseModel):
+class Rest(Schema):
     status: RestStatus
     next_allowed_start: datetime | None = None
     reason: str | None = None
 
 
-class Operator(BaseModel):
+class Operator(Schema):
     id: str
     name: str
     lang: Lang
@@ -123,7 +128,7 @@ class Operator(BaseModel):
     rest: Rest
 
 
-class Machine(BaseModel):
+class Machine(Schema):
     id: str
     type: MachineType
     model: str
@@ -133,7 +138,7 @@ class Machine(BaseModel):
     last_inspection: datetime | None = None
 
 
-class Job(BaseModel):
+class Job(Schema):
     id: str
     project_id: str
     title: str
@@ -144,7 +149,7 @@ class Job(BaseModel):
     status: JobStatus
 
 
-class Assignment(BaseModel):
+class Assignment(Schema):
     id: str
     operator_id: str
     date: date
@@ -153,7 +158,7 @@ class Assignment(BaseModel):
     machine: Machine
 
 
-class AssignmentCreate(BaseModel):
+class AssignmentCreate(Schema):
     operator_id: str
     job_id: str
     machine_id: str
@@ -161,13 +166,13 @@ class AssignmentCreate(BaseModel):
     shift: Shift = Shift.day
 
 
-class EstimateFactor(BaseModel):
+class EstimateFactor(Schema):
     name: str
     effect_pct: float
     note: str
 
 
-class Estimate(BaseModel):
+class Estimate(Schema):
     job_id: str
     estimated_hours: float
     range_hours: tuple[float, float]
@@ -175,13 +180,13 @@ class Estimate(BaseModel):
     project_completion_date: date | None = None
 
 
-class SessionCreate(BaseModel):
+class SessionCreate(Schema):
     operator_id: str
     machine_id: str
     job_id: str
 
 
-class Session(BaseModel):
+class Session(Schema):
     id: str
     operator_id: str
     machine_id: str
@@ -191,7 +196,7 @@ class Session(BaseModel):
     ended_at: datetime | None = None
 
 
-class SessionSummary(BaseModel):
+class SessionSummary(Schema):
     session_id: str
     duration_hours: float
     alerts_total: int
@@ -199,7 +204,7 @@ class SessionSummary(BaseModel):
     idle_minutes: float
 
 
-class ChecklistItem(BaseModel):
+class ChecklistItem(Schema):
     id: str
     text: str
     critical: bool
@@ -207,24 +212,24 @@ class ChecklistItem(BaseModel):
     note: str | None = None
 
 
-class ChecklistSection(BaseModel):
+class ChecklistSection(Schema):
     title: str
     items: list[ChecklistItem]
 
 
-class Checklist(BaseModel):
+class Checklist(Schema):
     session_id: str
     machine_type: MachineType
     standard_refs: list[str]
     sections: list[ChecklistSection]
 
 
-class ChecklistItemUpdate(BaseModel):
+class ChecklistItemUpdate(Schema):
     status: ChecklistStatus
     note: str | None = None
 
 
-class Briefing(BaseModel):
+class Briefing(Schema):
     session_id: str
     lang: Lang
     machine_summary: str
@@ -234,7 +239,7 @@ class Briefing(BaseModel):
     reminders: list[str]
 
 
-class AlertCreate(BaseModel):
+class AlertCreate(Schema):
     type: AlertType
     source: AlertSource
     severity: Severity
@@ -242,7 +247,7 @@ class AlertCreate(BaseModel):
     ts: datetime | None = None  # server fills in now() if missing
 
 
-class Alert(BaseModel):
+class Alert(Schema):
     id: str
     session_id: str
     type: AlertType
@@ -253,58 +258,58 @@ class Alert(BaseModel):
     acknowledged: bool
 
 
-class SimScenarioRequest(BaseModel):
+class SimScenarioRequest(Schema):
     session_id: str
     event: str  # SimEvent
 
 
-class AssistantRequest(BaseModel):
+class AssistantRequest(Schema):
     machine_id: str
     session_id: str | None = None
     question: str
     lang: Lang = Lang.en_IN
 
 
-class Source(BaseModel):
+class Source(Schema):
     doc: str
     section: str
 
 
-class AssistantAnswer(BaseModel):
+class AssistantAnswer(Schema):
     answer: str
     lang: Lang
     sources: list[Source]
 
 
-class TtsRequest(BaseModel):
+class TtsRequest(Schema):
     text: str
     lang: Lang
 
 
-class TranslateRequest(BaseModel):
+class TranslateRequest(Schema):
     text: str
     target: Lang
     source: Lang | None = None
 
 
-class TranslateResponse(BaseModel):
+class TranslateResponse(Schema):
     text: str
     lang: Lang
 
 
-class TrainingStep(BaseModel):
+class TrainingStep(Schema):
     kind: str  # text | video | tip
     content: str
     url: str | None = None
 
 
-class QuizQuestion(BaseModel):
+class QuizQuestion(Schema):
     q: str
     options: list[str]
     answer_index: int
 
 
-class TrainingModule(BaseModel):
+class TrainingModule(Schema):
     id: str
     machine_type: MachineType
     level: Experience
@@ -314,10 +319,10 @@ class TrainingModule(BaseModel):
     quiz: list[QuizQuestion]
 
 
-class TrainingCompleteRequest(BaseModel):
+class TrainingCompleteRequest(Schema):
     operator_id: str
     score: float
 
 
-class Ok(BaseModel):
+class Ok(Schema):
     ok: bool

@@ -27,6 +27,7 @@ from datetime import date, datetime, time, timedelta, timezone
 
 from sqlmodel import Session, SQLModel
 
+from app.clock import IST
 from app.db import engine
 from app.models import (
     Assignment,
@@ -38,7 +39,6 @@ from app.models import (
     WorkSession,
 )
 
-IST = timezone(timedelta(hours=5, minutes=30))
 DAY_SHIFT_START = time(9, 0)  # IST (03:30 UTC)
 NIGHT_SHIFT_START = time(21, 0)  # IST (15:30 UTC)
 

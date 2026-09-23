@@ -12,7 +12,7 @@
 |---|---|---|---|---|---|
 | B0 | Scaffold: FastAPI skeleton + `/health`, `db.py` (`get_db`), `models.py` (incl. `JobLog`), config, all routers stubbed returning §4 examples | E1 | M0 | ✅ | Do first. Flutter half (`flutter create`, pubspec, `main.dart`, `core/config.dart`) ➡️ moved to A |
 | B1 | Seed: 4 machines, ~5 operators, 2 projects, ~8 jobs, ~60 `JobLog` rows (varied weather/experience/actual-vs-planned) | — | M1 | ✅ | B6 depends on this |
-| B2 | Core endpoints: login, operators, machines, jobs, assignments | E2–E7, E9 | M1 | ⬜ | |
+| B2 | Core endpoints: login, operators, machines, jobs, assignments | E2–E7, E9 | M1 | ✅ | |
 | B3 | Fatigue / rest service (feeds E4, gate at E10) | in E4, E10 | M1 | ⬜ | |
 | B4 | Flutter data layer: models (incl. `AlertCreate`, `Telemetry`), `ApiClient`, `MockApiClient` + fixtures, `telemetryStreamProvider` (fake 1 Hz telemetry), providers | §6.1 | M1 | ➡️ | Moved to A (v2.1) |
 | B5 | `HttpApiClient` for all endpoints (incl. binary TTS, alert POST) | §6.1 | M2 | ➡️ | Moved to A (v2.1) |
@@ -29,7 +29,13 @@
 
 ## Ready for A
 - **B0 backend skeleton:** every endpoint E1–E27 + W1 exists and returns the CONTRACT §4 example JSON (stubs). Run it (SETUP §3) and point the app's real client at it; browse/try everything at `http://localhost:8000/docs`. W1 streams the §5 example telemetry every second for any session id. Errors follow §1 (`{"error": {"code", "message"}}`); bad enum values → 422 `VALIDATION_ERROR`. E24 `/voice/tts` returns 503 `UPSTREAM_UNAVAILABLE` until B12 — use on-device `flutter_tts`.
-- **B1 seed data** (`python -m app.seed`): IDs `op_001`–`op_005`, `mc_001`–`mc_004` (one per machine type), `prj_001`/`prj_002`, `job_001`–`job_008`, `asg_001`–`asg_008`. Contract example IDs (`op_001` Ravi / `mc_001` / `job_001` / `prj_001`) are real seeded rows, so your mock fixtures line up. Demo logins + PINs + rest-status story are in SETUP §3.2 (`op_001` / 1234 = Ravi, ta-IN). Not served by the API until B2 — endpoints still return stubs.
+- **B1 seed data** (`python -m app.seed`): IDs `op_001`–`op_005`, `mc_001`–`mc_004` (one per machine type), `prj_001`/`prj_002`, `job_001`–`job_008`, `asg_001`–`asg_008`. Contract example IDs (`op_001` Ravi / `mc_001` / `job_001` / `prj_001`) are real seeded rows, so your mock fixtures line up. Demo logins + PINs + rest-status story are in SETUP §3.2 (`op_001` / 1234 = Ravi, ta-IN). Served live since B2 (below).
+- **B2 live on seeded data: E2–E7, E9.** Stubs remain for E8 estimate (B6), sessions/checklist/briefing (B7), W1 + sim (B8), alerts (B9), assistant (B11), voice (B12), training (B13). Notes for your `HttpApiClient`:
+  - `hours_today` / `hours_7d` are `0` and `rest.status` is always `ok` until **B3** (fatigue) lands — shape is final.
+  - E5 `range`: `day` = today (IST), `week` = today + next 6 days, `month` = today + next 29 days; sorted by date then shift.
+  - Error codes (all in the §1 format): E2 `401 BAD_PIN`, `404 OPERATOR_NOT_FOUND`; E4/E5 `404 OPERATOR_NOT_FOUND`; E6 `404 MACHINE_NOT_FOUND`; E7/E8 `404 JOB_NOT_FOUND`; E9 also `422 MACHINE_TYPE_MISMATCH`, `409 ASSIGNMENT_CONFLICT`; bad query/body → `422 VALIDATION_ERROR`.
+  - Times are ISO 8601 UTC with `Z` (e.g. `scheduled_start: "…T03:30:00Z"` = 09:00 IST).
+  - The server auto-seeds an empty DB on startup; `python -m app.seed` still re-seeds on demand.
 
 ## Blockers
 _None_
@@ -45,3 +51,4 @@ _None_
 | 2026-09-23 | Created `CLAUDE.local.md` (Person B). Re-split ownership v2.1: whole Flutter app → A (CLAUDE.md §2–4/§9, CONTRACT v2.1, app/CLAUDE.md, backend/CLAUDE.md, SETUP §4, DECISIONS #14). | Get A's OK, then B0 (backend scaffold). |
 | 2026-09-23 | B0 ✅: FastAPI app (`main.py`, `config.py`, `db.py`, `models.py` incl. `JobLog`/`Alert`/`ChecklistItemState`, `schemas.py` = §2/§4, `errors.py` = §1), 10 routers + `ai/router_assistant.py` + `ai/router_voice.py` all stubbed with §4 data, W1 stub stream. `tests/test_b0_stubs.py` 15/15 pass; uvicorn boots, `/docs` lists all 26 contract paths + `/health`. `.gitignore` for estimator/chroma. SETUP §3 → python3.11. | B1 seed, then B2 core endpoints + B3 fatigue. |
 | 2026-09-23 | B1 ✅: `app/seed.py` — 5 operators (en/hi/ta, fatigue cast: ok / warning 52 h / must_rest after 12 h night), 4 machines, 2 projects, 8 jobs (with weather + hazards), 8 assignments across day/week/month, 23 past ended sessions as work history, 60 `JobLog` rows with a real weather/experience/machine signal. All relative to seed time (IST day). Switched DB convention to tz-aware UTC (SQLModel requires it). `tests/test_seed.py` incl. a 24-hour sweep for overlap/future-work; 48/48 pass. SETUP §3.2 demo logins. | B2 core endpoints on seeded data, then B3 fatigue. |
+| 2026-09-23 | B2 ✅: E2 login (401 `BAD_PIN`), E3/E4 operators, E5 assignments (day/week/month from IST today), E6 machines, E7 job, E9 create assignment (type-mismatch 422, operator/machine double-booking 409, `asg_NNN` ids). Shared `views.py` (row→§4 builders, 404 codes), `clock.py` (IST today), `ids.py`, `services/fatigue.py` placeholder for B3. Schemas `from_attributes`. Auto-seed empty DB on startup. `tests/test_core.py`; 58/58 pass; live smoke on a fresh DB OK. | B3 fatigue service (hours + rest + E10 gate). |

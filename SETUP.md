@@ -43,7 +43,7 @@ python -m app.seed                       # wipes and refills backend/rebase.db w
 python -m app.ai.train_estimator         # trains the XGBoost time estimator → data/models/estimator.json
 # The RAG vector store builds itself on first server start (ingests data/manuals/ into data/models/chroma/).
 ```
-Re-seed right before a demo: all dates and work hours are relative to when the seed runs.
+Re-seed right before a demo: all dates and work hours are relative to when the seed runs. (If the DB is empty, the server seeds it automatically on startup.)
 
 Demo logins (PINs are checked but not secure):
 
