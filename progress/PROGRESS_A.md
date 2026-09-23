@@ -26,8 +26,8 @@
 | A13 | Tests (`test/features/*`, `test/edge/`) + SETUP "App" / "Edge" sections | — | M5 | ⬜ | |
 | A14 | Stretch: noise-robust capture polish, `te-IN`, on-device DSP | — | Stretch | ⬜ | Only after M4 |
 | A15 | Scaffold Flutter project (`flutter create`), `pubspec.yaml`, `main.dart`, l10n codegen, `core/locale.dart` | — | M0 | ✅ | Done. `flutter pub get` (44 deps), `gen-l10n` (en/hi/ta), `analyze` clean, `flutter test` 10/10. Edge/voice deps deferred to A9/A10 |
-| A16 | Data layer: `core/models/*` (per §4) + barrel, `ApiClient`, `MockApiClient` + `assets/mock` fixtures, `telemetryStreamProvider`, providers | §6.1 | M1 | ⬜ | Adopted from B4 |
-| A17 | `HttpApiClient` (all endpoints incl. binary TTS, alert POST) | §6.1 | M2 | ⬜ | Adopted from B5 |
+| A16 | Data layer: `core/models/*` (per §4) + barrel, `ApiClient`, `MockApiClient` + Dart fixtures, `telemetryStreamProvider`, `apiClientProvider` | §6.1 | M1 | ✅ | 12 model files + barrel; MockApiClient stateful (alert post→list→ack); fake 1 Hz telemetry. `analyze` clean, tests 15/15. Fixtures in Dart (`mock_data.dart`), not assets/mock |
+| A17 | `HttpApiClient` (all endpoints incl. binary TTS, alert POST) | §6.1 | M2 | 🟦 | Implemented (dio, 1:1 with §3). **Untested against backend** — verify vs B's stubs (needs backend running) |
 | A18 | Training Hub screens (steps, video, quiz, complete, 3 langs) — consumes E26/E27 | E26, E27 | M4 | ⬜ | Adopted from B14; content from B13 |
 
 ## Ready for B
@@ -48,3 +48,4 @@ _None._ v2.1 (DECISIONS #14): I own the whole `app/` and have Flutter installed 
 | 2026-09-23 | A8 (early): implemented full telemetry rule engine in `edge/telemetry_rules.dart` (edge-trigger, debounce, severity escalation, 6 alert types) + `test/edge/telemetry_rules_test.dart`. Verified 8/8 with a standalone `dart run` (no project needed). | Wire engine → `postAlert` (E18) in `alert_dispatch.dart` once B exposes core `AlertCreate`. |
 | 2026-09-23 | A12 (content): authored `l10n.yaml` + `app_en/hi/ta.arb` (38 keys each, incl. all 9 alert types by `type`). Validated JSON + key parity across locales. | After B0: `flutter gen-l10n`, add a locale provider for live switching, wire keys into screens. Flag hi/ta for native review. |
 | 2026-09-23 | A9 (logic): split the headline CV feature — `cv_decider.dart` (pure-Dart decision logic: sustained-window drowsiness/distraction/absence, latch + re-arm, blink rejection) + `cv_monitor.dart` (ML Kit plugin shell) + `test/edge/cv_decider_test.dart`. Verified 7/7 standalone. | Wire ML Kit `FaceDetector` + front `camera` → `onObservation` on a real device once B0 lands; then `postAlert` (E18). |
+| 2026-09-23 | v2.1 accepted; **A15** scaffolded the real Flutter app (pubspec, main, l10n gen). **A16** built the whole data layer (12 models + barrel, `ApiClient`, tested `MockApiClient`, fake telemetry stream, `apiClientProvider`). **A17** `HttpApiClient` implemented. `analyze` clean, `flutter test` 15/15. | Wire screens onto the data layer: A2 login (operator picker + PIN + language), A3 dashboard, then A7 live screen (telemetry + edge alerts). Verify A17 against B's running backend later. |

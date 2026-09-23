@@ -79,7 +79,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String get checklist_title => 'प्रारंभ-पूर्व जाँच सूची';
 
   @override
-  String get checklist_complete_blocked => 'शुरू करने से पहले गंभीर खराबी ठीक करें';
+  String get checklist_complete_blocked =>
+      'शुरू करने से पहले गंभीर खराबी ठीक करें';
 
   @override
   String get briefing_title => 'ब्रीफिंग';
