@@ -4,7 +4,7 @@
 > Status: ⬜ todo · 🟨 doing · ✅ done (matches CONTRACT, tested, works on real API) · 🟦 done on mock/stub only · ⛔ blocked · ➡️ moved
 > Person A writes **no backend code** in v2.0. All screens + on-device intelligence.
 
-**Last updated:** 2026-09-23 (A0 authored)  **Current milestone:** M0  **Contract version in use:** v2.0
+**Last updated:** 2026-09-23 (A0 authored; A8 rule engine done + verified)  **Current milestone:** M0  **Contract version in use:** v2.0
 
 ## Tasks
 
@@ -18,11 +18,11 @@
 | A5 | Pre-start checklist screen: fetch, mark items, defect gating UI, complete | E12–E14 | M3 | ⬜ | Checklist content served by B |
 | A6 | Briefing screen: display + read-aloud (on-device TTS / E24) | E15, E24 | M3 | ⬜ | |
 | A7 | Live session screen: telemetry gauges from WS, alert banner (colour+icon+text+sound/vibration), ack, end summary | W1, E16–E20 | M3 | ⬜ | |
-| A8 | On-device telemetry rule engine (`edge/`): seatbelt/proximity/idle/overheat/overload/unsafe → build `AlertCreate` → POST E18; debounce | W1, E18 | M3 | ⬜ | The "rules moved to frontend" part |
-| A9 | **Edge CV (ML Kit face detection)**: drowsiness/distraction/absence → `AlertCreate` (`source: edge_cv`) → POST E18 | E18 | M4 | ⬜ | Headline demo moment; real front camera |
+| A8 | On-device telemetry rule engine (`edge/`): seatbelt/proximity/idle/overheat/overload/unsafe → build `AlertCreate` → POST E18; debounce | W1, E18 | M3 | 🟦 | Engine logic done + verified (8/8 checks). Pure Dart, edge-triggered + severity escalation. Remaining: swap `AlertDraft`→core `AlertCreate` and wire `postAlert` (needs B0). Test at `test/edge/telemetry_rules_test.dart` |
+| A9 | **Edge CV (ML Kit face detection)**: drowsiness/distraction/absence → `AlertCreate` (`source: edge_cv`) → POST E18 | E18 | M4 | 🟨 | Decision logic done + verified (7/7): `cv_decider.dart` (sustained-window timing, latch/re-arm, blink rejection). `cv_monitor.dart` = plugin shell. Remaining: wire `camera`+ML Kit `FaceDetector` frames → `onObservation` (needs project + device) + `postAlert`. Test at `test/edge/cv_decider_test.dart` |
 | A10 | Voice loop: push-to-talk → on-device STT (`speech_to_text`) → E23 ask → show answer + TTS playback | E23, E24 | M4 | ⬜ | Always show text too |
 | A11 | Assistant chat screen (Q&A UI + sources) | E23 | M4 | ⬜ | |
-| A12 | l10n: en, hi, ta ARB files incl. alert texts by `type`; full-app language switching | — | M4 | ⬜ | Demo langs en/hi/ta |
+| A12 | l10n: en, hi, ta ARB files incl. alert texts by `type`; full-app language switching | — | M4 | 🟦 | ARB files done (38 keys × en/hi/ta, JSON + key-parity verified) + `l10n.yaml`. Alert texts keyed by type. Remaining: `flutter gen-l10n` (needs B pubspec `generate: true`) + language-switch provider + wire strings into screens. hi/ta need a native-speaker review pass |
 | A13 | Tests (`test/features/*`, `test/edge/`) + SETUP "App" / "Edge" sections | — | M5 | ⬜ | |
 | A14 | Stretch: noise-robust capture polish, `te-IN`, on-device DSP | — | Stretch | ⬜ | Only after M4 |
 
@@ -43,3 +43,6 @@
 | When | Did | Next |
 |---|---|---|
 | 2026-09-23 | A0: authored theme, router, 3 shared widgets, 8 placeholder screens, edge skeleton (rules/CV/dispatch). Blocked on B0 for `flutter analyze`. | Pull once B0 lands → `flutter analyze` → fix imports → push A0. Then A1 (real theme + widgets). |
+| 2026-09-23 | A8 (early): implemented full telemetry rule engine in `edge/telemetry_rules.dart` (edge-trigger, debounce, severity escalation, 6 alert types) + `test/edge/telemetry_rules_test.dart`. Verified 8/8 with a standalone `dart run` (no project needed). | Wire engine → `postAlert` (E18) in `alert_dispatch.dart` once B exposes core `AlertCreate`. |
+| 2026-09-23 | A12 (content): authored `l10n.yaml` + `app_en/hi/ta.arb` (38 keys each, incl. all 9 alert types by `type`). Validated JSON + key parity across locales. | After B0: `flutter gen-l10n`, add a locale provider for live switching, wire keys into screens. Flag hi/ta for native review. |
+| 2026-09-23 | A9 (logic): split the headline CV feature — `cv_decider.dart` (pure-Dart decision logic: sustained-window drowsiness/distraction/absence, latch + re-arm, blink rejection) + `cv_monitor.dart` (ML Kit plugin shell) + `test/edge/cv_decider_test.dart`. Verified 7/7 standalone. | Wire ML Kit `FaceDetector` + front `camera` → `onObservation` on a real device once B0 lands; then `postAlert` (E18). |
