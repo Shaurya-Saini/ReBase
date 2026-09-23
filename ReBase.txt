@@ -1,0 +1,37 @@
+Current Idea:ReBase
+Context: The project is meant as intelligent assistance tool for construction/mining equipment (example excavators, loaders, drillers) operators.
+
+The main idea revolves around a personal Operator Tablet which is also mountable to the equipment/machinery and through a port collects any/all data of the equipment/machinery (example video survailence inside and outside cabin, sensor readings, machine Id, etc).
+
+The Operator Tablet functions in two main operational modes:
+
+1. MOUNTED/IN-SESSION
+- When the tablet is already connected to the machinery/or the operator's job has started.
+- The work here is divided into two states:
+
+1.1 BEFORE SESSION
+- Involves activities/tasks that are performed automatically or requires completion by the operator before starting and using the actual equipment.
+- Machine Identification, machine id, components status, etc
+- Pre-start Procedure, example in how pre-flight checks are performed by pilot and copilot, similarly here the tablets acts like a copiolt and supports the operators in performing a detailed checks of all components and equipment and also tracks/stores the checks for future reference in logs and DB. The exact checklists/procedures should be derived from an Internationally accepted standard.
+- Operational Breifing: A quick run down of the machine, the job to be performed, the time estimated, etc
+
+
+1.2 DURING SESSION
+- Involves assistance and security features provided by the operator tablet during the actual job/operations.
+- Safety alerts and Features: example, Unusual behavior of the operator detected using in-cab cameras, seatbelt and safety measures compliance, proximity hazards, incident logging, machine behavior like excessive idling or unsafe operation patterns, etc
+- In session operation assistance: Using machine specification and its data like manuals for assisting the operator through answering questions like "How to switch between operation modes", "what does this button do", "Procedure for attaching this button"
+
+
+
+2. UNMOUNTED/PERSONAL TIME
+- When the operator is not working or outside of shift, just before or after the shifts starts or is completed.
+- Involves a big database of entities like Operators, Machinery and Jobs. A main manager would assign jobs to operators which would then be reflected in their daily task dashboards or weekly, monthly, yearly plans until the project is completed. This will also include keeping track of jobs and machinery the operator has worked with number of hours. Overall 
+- A task timing estimation for completion (Based on past data and env factors), project time completion estimation, individual operator's working hours, resting period (similar to how pilots have resting periods after long working hours)
+- OPERATOR TRAINING HUB: Around 30-45 minutes prior to the shift starts we can have a text-based/e-learning video based training/recap session based on the operator's experience level on the equipment/machinery the operator will be working on in the upcoming shift. This is so that the operator is aware of the features, status, functioning of the machinery/equipment.
+
+
+SUPER POINTS:
+These are points that make the project stand out and make it overall better than the current available products in the market.
+1. Multi Lingual (Using differnet languages in UI and in Voice assistance modes (Sarvam AI))
+2. Voice Assistance (Based on the operator's first language) + Noise Cancelation (When the operator is working in heavy noise env to reduce the ear damage while also enabling voice assistance)
+3. Operator Training HUB and Operator In-session Assistance.

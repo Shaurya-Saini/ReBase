@@ -1,0 +1,14 @@
+# personal / secrets
+CLAUDE.local.md
+.env
+# python
+__pycache__/
+.venv/
+*.db
+.pytest_cache/
+# flutter
+app/.dart_tool/
+app/build/
+app/.flutter-plugins*
+app/.packages
+backend/data/models/*.joblib
