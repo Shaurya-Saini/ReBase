@@ -117,6 +117,8 @@ flutter test                # widget/unit/edge tests
 ### 5.1 Keys
 Fill `SARVAM_API_KEY`, `LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL` in `.env`. Without them, cloud voice/assistant return a clear 503 and everything else still works (STT and default TTS are on-device).
 
+**LLM is optional and free.** Default `LLM_PROVIDER=gemini` (Google Gemini free tier, model `gemini-3.8-flash`): get a key at https://aistudio.google.com/apikey and put it in `LLM_API_KEY`. `LLM_PROVIDER=anthropic` also works. With no key, the briefing (E15) uses a built-in template with en/hi/ta phrases — the demo works fully without any LLM key.
+
 ### 5.2 Re-train the estimator (after any re-seed)
 ```bash
 cd backend && python -m app.ai.train_estimator   # writes data/models/estimator.json

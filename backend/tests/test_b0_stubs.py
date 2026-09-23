@@ -1,4 +1,4 @@
-"""B0: endpoints still on stubs return the §4 shape. (E2–E7, E9 → test_core.py)
+"""B0: endpoints still on stubs return the §4 shape. (real ones: test_core / test_estimator / test_fatigue / test_sessions / test_simulator)
 
 As each task replaces a stub with the real thing, move its checks into that
 router's own test file with real seeded data.
@@ -18,32 +18,6 @@ def test_tables_created(client):
             "trainingcompletion"} <= tables
 
 
-def test_e10_to_e17_session_flow(client):
-    body = {"operator_id": "op_001", "machine_id": "mc_001", "job_id": "job_001"}
-    r = client.post("/sessions", json=body)
-    assert r.status_code == 201 and r.json()["state"] == "pre_start"
-    assert client.get("/sessions/ses_001").json()["id"] == "ses_001"
-
-    chk = client.get("/sessions/ses_001/checklist").json()
-    assert chk["sections"][0]["items"][1]["critical"] is True
-    item = client.put("/sessions/ses_001/checklist/items/chk_02",
-                      json={"status": "defect", "note": "leak"}).json()
-    assert item["status"] == "defect" and item["note"] == "leak"
-    assert client.post("/sessions/ses_001/checklist/complete").json()["state"] == "briefing"
-
-    br = client.get("/sessions/ses_001/briefing", params={"lang": "ta-IN"}).json()
-    assert br["lang"] == "ta-IN" and br["hazards"]
-    assert client.post("/sessions/ses_001/start").json()["state"] == "active"
-    assert client.post("/sessions/ses_001/end").json()["alerts_total"] == 4
-
-
-def test_w1_telemetry_ws(client):
-    with client.websocket_connect("/ws/sessions/ses_001") as ws:
-        msg = ws.receive_json()
-    assert msg["type"] == "telemetry"
-    assert msg["ts"].endswith("Z")
-    assert set(msg["data"]) == {"engine_rpm", "hydraulic_temp_c", "fuel_pct", "load_pct",
-                                "speed_kmh", "idle_seconds", "seatbelt", "proximity_m"}
 
 
 def test_e18_e19_e20_alerts(client):
@@ -63,14 +37,6 @@ def test_e18_rejects_unknown_alert_type(client):
     assert r.status_code == 422
     assert r.json()["error"]["code"] == "VALIDATION_ERROR"
 
-
-def test_e21_e22_sim(client):
-    events = client.get("/sim/scenarios").json()
-    assert "normal" in events and "seatbelt_off" in events
-    assert client.post("/sim/scenario",
-                       json={"session_id": "ses_001", "event": "overheat"}).status_code == 202
-    r = client.post("/sim/scenario", json={"session_id": "ses_001", "event": "nope"})
-    assert r.status_code == 422 and r.json()["error"]["code"] == "UNKNOWN_EVENT"
 
 
 def test_e23_assistant(client):

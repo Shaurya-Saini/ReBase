@@ -8,7 +8,7 @@ Read the root `CLAUDE.md` and `backend/CLAUDE.md` first. In v2.0 all backend AI 
 backend/app/ai/
 ├── router_assistant.py   E23 /assistant/ask (RAG + LLM)                 ← mounted by main.py
 ├── router_voice.py       E24 /voice/tts, E25 /translate (Sarvam)        ← mounted by main.py
-├── llm.py                one complete(prompt, lang) -> str, provider from env
+├── llm.py                complete_json(system, prompt, schema) -> dict; LLM_PROVIDER gemini | anthropic; raises LLMUnavailable → caller falls back
 ├── sarvam.py             tts(), translate() — the only place Sarvam is called
 ├── rag.py                ChromaDB store: ingest manuals + checklists → embed → retrieve top-k
 ├── checklists.py         read data/checklists/<machine_type>.yaml → Checklist (served by E12)

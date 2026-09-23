@@ -1,0 +1,31 @@
+# Pre-start checklist — crawler drill rig (generic).
+# Based on MSHA 30 CFR 56.14100, ISO 20474-1 and typical OEM daily checks for
+# surface drill rigs. "Based on", not certified.
+machine_type: drill_rig
+standard_refs: ["MSHA 30 CFR 56.14100", "ISO 20474"]
+sections:
+  - title: Walk-around
+    items:
+      - {id: chk_01, text: "Check tracks and undercarriage for damage", critical: false}
+      - {id: chk_02, text: "Check hydraulic hoses on feed and boom for leaks", critical: true}
+      - {id: chk_03, text: "Check mast, feed beam and centralizer for cracks or loose bolts", critical: true}
+      - {id: chk_04, text: "Check drill rods, bit and shank adapter for wear", critical: false}
+      - {id: chk_05, text: "Check dust collector and hoses are intact", critical: false}
+  - title: Fluids
+    items:
+      - {id: chk_06, text: "Check engine and compressor oil levels", critical: false}
+      - {id: chk_07, text: "Check hydraulic oil level", critical: false}
+      - {id: chk_08, text: "Check coolant level", critical: false}
+      - {id: chk_09, text: "Look under the machine for fresh fuel, oil or coolant leaks", critical: true}
+  - title: Cab and controls
+    items:
+      - {id: chk_10, text: "Seatbelt latches and is not frayed", critical: true}
+      - {id: chk_11, text: "Tramming brakes hold", critical: true}
+      - {id: chk_12, text: "Rotation and feed controls return to neutral", critical: true}
+  - title: Safety devices
+    items:
+      - {id: chk_13, text: "Emergency stop buttons work (cab and drill deck)", critical: true}
+      - {id: chk_14, text: "Rotation guard / rod-handling guard in place", critical: true}
+      - {id: chk_15, text: "Horn and travel alarm work", critical: true}
+      - {id: chk_16, text: "Work lights work", critical: false}
+      - {id: chk_17, text: "Fire extinguisher present and charged", critical: false}

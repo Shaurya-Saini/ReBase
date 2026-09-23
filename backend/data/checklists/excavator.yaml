@@ -1,0 +1,34 @@
+# Pre-start checklist — hydraulic excavator (generic).
+# Based on MSHA 30 CFR 56.14100 (pre-shift examination of mobile equipment),
+# ISO 20474-1/-5 (earth-moving machinery safety; hydraulic excavators) and
+# typical OEM daily walk-around checks. "Based on", not certified.
+# critical: true → a `defect` blocks session start (E14 CRITICAL_DEFECT).
+machine_type: excavator
+standard_refs: ["MSHA 30 CFR 56.14100", "ISO 20474"]
+sections:
+  - title: Walk-around
+    items:
+      - {id: chk_01, text: "Check tracks and undercarriage for damage", critical: false}
+      - {id: chk_02, text: "Check hydraulic hoses for leaks", critical: true}
+      - {id: chk_03, text: "Check boom, arm and bucket pins and bushings for wear or missing retainers", critical: true}
+      - {id: chk_04, text: "Check bucket teeth and cutting edge", critical: false}
+      - {id: chk_05, text: "Check for cracks or damage on boom, arm and counterweight", critical: true}
+  - title: Fluids
+    items:
+      - {id: chk_06, text: "Check engine oil level", critical: false}
+      - {id: chk_07, text: "Check hydraulic oil level", critical: false}
+      - {id: chk_08, text: "Check coolant level", critical: false}
+      - {id: chk_09, text: "Look under the machine for fresh fuel, oil or coolant leaks", critical: true}
+  - title: Cab and controls
+    items:
+      - {id: chk_10, text: "Seatbelt latches and is not frayed", critical: true}
+      - {id: chk_11, text: "Swing and travel brakes hold", critical: true}
+      - {id: chk_12, text: "Joysticks return to neutral; hydraulic lock lever works", critical: true}
+      - {id: chk_13, text: "Windows and mirrors clean and undamaged", critical: false}
+  - title: Safety devices
+    items:
+      - {id: chk_14, text: "Horn works", critical: true}
+      - {id: chk_15, text: "Travel alarm sounds", critical: true}
+      - {id: chk_16, text: "Work lights work", critical: false}
+      - {id: chk_17, text: "Fire extinguisher present and charged", critical: false}
+      - {id: chk_18, text: "Access steps and handrails secure", critical: false}

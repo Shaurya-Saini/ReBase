@@ -1,0 +1,32 @@
+# Pre-start checklist — articulated dump truck (generic).
+# Based on MSHA 30 CFR 56.14100, ISO 20474-1/-6 (dumpers) and typical OEM
+# daily walk-around checks. "Based on", not certified.
+machine_type: dump_truck
+standard_refs: ["MSHA 30 CFR 56.14100", "ISO 20474"]
+sections:
+  - title: Walk-around
+    items:
+      - {id: chk_01, text: "Check tyres for cuts, bulges and correct inflation", critical: true}
+      - {id: chk_02, text: "Check wheel nuts are tight and none missing", critical: true}
+      - {id: chk_03, text: "Check body hoist cylinders and hoses for leaks", critical: true}
+      - {id: chk_04, text: "Check tailgate and body pins", critical: false}
+      - {id: chk_05, text: "Articulation lock removed and stowed", critical: true}
+  - title: Fluids
+    items:
+      - {id: chk_06, text: "Check engine oil level", critical: false}
+      - {id: chk_07, text: "Check transmission and hydraulic oil levels", critical: false}
+      - {id: chk_08, text: "Check coolant level", critical: false}
+      - {id: chk_09, text: "Look under the machine for fresh fuel, oil or coolant leaks", critical: true}
+  - title: Cab and controls
+    items:
+      - {id: chk_10, text: "Seatbelt latches and is not frayed", critical: true}
+      - {id: chk_11, text: "Service, parking and retarder brakes work", critical: true}
+      - {id: chk_12, text: "Steering responds smoothly in both directions", critical: true}
+      - {id: chk_13, text: "Mirrors and camera screen clean and adjusted", critical: false}
+  - title: Safety devices
+    items:
+      - {id: chk_14, text: "Horn works", critical: true}
+      - {id: chk_15, text: "Reverse alarm sounds", critical: true}
+      - {id: chk_16, text: "Head, brake and indicator lights work", critical: true}
+      - {id: chk_17, text: "Body-up warning light works", critical: false}
+      - {id: chk_18, text: "Fire extinguisher present and charged", critical: false}

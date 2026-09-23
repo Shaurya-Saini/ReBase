@@ -1,0 +1,31 @@
+# Pre-start checklist — wheel loader (generic).
+# Based on MSHA 30 CFR 56.14100, ISO 20474-1/-3 (loaders) and typical OEM
+# daily walk-around checks. "Based on", not certified.
+machine_type: wheel_loader
+standard_refs: ["MSHA 30 CFR 56.14100", "ISO 20474"]
+sections:
+  - title: Walk-around
+    items:
+      - {id: chk_01, text: "Check tyres for cuts, bulges and correct inflation", critical: true}
+      - {id: chk_02, text: "Check hydraulic hoses and cylinders for leaks", critical: true}
+      - {id: chk_03, text: "Check lift arm and bucket pins for wear or missing retainers", critical: true}
+      - {id: chk_04, text: "Check bucket cutting edge and teeth", critical: false}
+      - {id: chk_05, text: "Articulation lock pin removed and stowed", critical: true}
+  - title: Fluids
+    items:
+      - {id: chk_06, text: "Check engine oil level", critical: false}
+      - {id: chk_07, text: "Check hydraulic and transmission oil levels", critical: false}
+      - {id: chk_08, text: "Check coolant level", critical: false}
+      - {id: chk_09, text: "Look under the machine for fresh fuel, oil or coolant leaks", critical: true}
+  - title: Cab and controls
+    items:
+      - {id: chk_10, text: "Seatbelt latches and is not frayed", critical: true}
+      - {id: chk_11, text: "Service and parking brakes hold", critical: true}
+      - {id: chk_12, text: "Steering responds smoothly in both directions", critical: true}
+      - {id: chk_13, text: "Windows and mirrors clean and undamaged", critical: false}
+  - title: Safety devices
+    items:
+      - {id: chk_14, text: "Horn works", critical: true}
+      - {id: chk_15, text: "Reverse alarm sounds", critical: true}
+      - {id: chk_16, text: "Head, tail and work lights work", critical: false}
+      - {id: chk_17, text: "Fire extinguisher present and charged", critical: false}

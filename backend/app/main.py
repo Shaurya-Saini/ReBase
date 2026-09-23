@@ -1,5 +1,6 @@
 """ReBase backend. Run: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"""
 
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -22,6 +23,7 @@ from app.routers import (
     ws,
 )
 from app.schemas import Health
+from app.simulator.engine import engine as simulator
 
 
 @asynccontextmanager
@@ -29,8 +31,11 @@ async def lifespan(_: FastAPI):
     create_db()
     _seed_if_empty()
     _train_estimator_if_missing()
-    # TODO B8: start simulator · TODO B10: warm RAG store
+    _restore_simulator()
+    sim_task = asyncio.create_task(simulator.run())
+    # TODO B10: warm RAG store
     yield
+    sim_task.cancel()
 
 
 def _seed_if_empty() -> None:
@@ -43,6 +48,19 @@ def _seed_if_empty() -> None:
     with Session(engine) as db:
         if db.exec(select(Operator)).first() is None:
             seed(engine)
+
+
+def _restore_simulator() -> None:
+    """Resume telemetry for sessions that were active when the server stopped."""
+    from sqlmodel import Session, select
+
+    from app.models import Machine, WorkSession
+
+    simulator.reset()
+    with Session(engine) as db:
+        for s in db.exec(select(WorkSession).where(WorkSession.state == "active")).all():
+            machine = db.get(Machine, s.machine_id)
+            simulator.start(s.id, machine.type if machine else "excavator")
 
 
 def _train_estimator_if_missing() -> None:
