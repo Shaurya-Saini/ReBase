@@ -10,7 +10,7 @@ backend/app/ai/
 ├── router_voice.py       E24 /voice/tts, E25 /translate (Sarvam)        ← mounted by main.py
 ├── llm.py                complete_json(system, prompt, schema) -> dict; LLM_PROVIDER gemini | anthropic; raises LLMUnavailable → caller falls back
 ├── sarvam.py             tts(), translate() — the only place Sarvam is called
-├── rag.py                ChromaDB store: ingest manuals + checklists → embed → retrieve top-k
+├── rag.py                ChromaDB store: ingest manuals (### section = chunk) → embed (English) → retrieve top-k; RELEVANCE_MIN cut-off
 ├── checklists.py         read data/checklists/<machine_type>.yaml → Checklist (served by E12)
 ├── estimator.py          load XGBoost model, predict hours + range + factors (E8)
 ├── train_estimator.py    `python -m app.ai.train_estimator` → data/models/estimator.json

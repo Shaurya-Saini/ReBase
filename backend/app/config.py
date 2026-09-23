@@ -46,13 +46,14 @@ class Settings:
 
     # AI / voice (empty key -> those endpoints return 503, never crash)
     SARVAM_API_KEY = os.getenv("SARVAM_API_KEY", "")
-    LLM_PROVIDER = os.getenv("LLM_PROVIDER", "anthropic")
+    LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini")
     LLM_API_KEY = os.getenv("LLM_API_KEY", "")
     LLM_MODEL = os.getenv("LLM_MODEL", "")
     EMBEDDING_MODEL = os.getenv(
         "EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"
     )
     CHROMA_DIR = str((BACKEND_DIR / os.getenv("CHROMA_DIR", "./data/models/chroma")).resolve())
+    RAG_WARMUP = os.getenv("RAG_WARMUP", "1") != "0"  # build the vector store at server start
     ESTIMATOR_PATH = str(
         (BACKEND_DIR / os.getenv("ESTIMATOR_PATH", "./data/models/estimator.json")).resolve()
     )
