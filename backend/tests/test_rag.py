@@ -75,6 +75,22 @@ def test_off_topic_is_not_relevant(store):
         assert rag.relevant(rag.retrieve(q, "excavator", k=3)) == [], q
 
 
+def test_interrupted_build_is_rebuilt(store):
+    """Regression: a build killed mid-embedding (uvicorn --reload) left an empty store
+    carrying the right content hash, so every question got 'not found'."""
+    client = rag._client()
+    digest = store.metadata["content_hash"]
+    client.delete_collection(rag.COLLECTION)
+    client.create_collection(rag.COLLECTION, embedding_function=None,
+                             configuration={"hnsw": {"space": "cosine"}},
+                             metadata={"content_hash": digest,
+                                       "embedding_model": rag.settings.EMBEDDING_MODEL})  # empty!
+    rag._collection = None
+    col = rag.build()
+    assert col.count() == len(rag.all_chunks())
+    assert rag.retrieve("How do I switch to power mode?", "excavator")[0].section == "4.2 Operating modes"
+
+
 def test_reopen_without_rebuild_and_rebuild_on_change(store, monkeypatch):
     rag._collection = None
     assert rag.build().metadata["content_hash"] == store.metadata["content_hash"]
