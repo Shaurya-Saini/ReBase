@@ -39,5 +39,5 @@ backend/
 - **Checklists** come from `data/checklists/*.yaml` via the RAG/content layer; B stores per-session status/notes and enforces the critical-defect gate at E14.
 - **Fatigue gate:** E10 returns 409 `REST_REQUIRED` when the operator's hours violate the configured limits.
 - Simulator must be demo-friendly: normal values with small noise; a scenario nudge lasts ~10 s then returns to `normal`.
-- M0 duty: commit `db.py`, `models.py` (tables can be minimal but `JobLog`/`Alert` fields must match §4), all routers stubbed returning §4 example data, and the Flutter `core/` stubs (see `app/CLAUDE.md`).
+- M0 duty: commit `db.py`, `models.py` (tables can be minimal but `JobLog`/`Alert` fields must match §4), all routers stubbed returning §4 example data. (Since v2.1 the Flutter `core/` stubs are A's — B writes no Flutter code.)
 - Run `pytest -q` before every merge to `main`.

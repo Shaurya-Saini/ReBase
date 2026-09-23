@@ -63,7 +63,7 @@ pytest -q                   # runs all backend tests
 
 ---
 
-## 4. App  [Owner: B]  (A adds UI/edge errors to 4.5)
+## 4. App  [Owner: A]
 
 ### 4.1 Install
 ```bash

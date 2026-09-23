@@ -1,7 +1,7 @@
-# ReBase — API + Internal Contract (v2.0)
+# ReBase — API + Internal Contract (v2.1)
 
 Single source of truth between **Person A (Edge AI + UI)** and **Person B (Infra + Backend AI)**. Change only via the protocol in `CLAUDE.md` §6.
-B copies the JSON examples below into `app/assets/mock/` as mock fixtures. §6 defines the code-level interfaces (Flutter providers) between the two halves.
+A copies the JSON examples below into `app/assets/mock/` as mock fixtures. Since v2.1 the split is **A = the entire Flutter app, B = the entire backend**; the HTTP/WS contract (§3–§5) is the only interface between them. §6 lists the Flutter interfaces A builds.
 
 > **v2.0 re-architecture (read this):** Safety detection now runs **on the tablet (A)** — real computer-vision alerts from the front camera (ML Kit) plus threshold rules over streamed telemetry. The backend **simulates machine sensors** and streams them; it no longer decides alerts, it **stores** the alerts the app posts. Checklists, the manual Q&A assistant, and the briefing are served from the **backend RAG (B)**. Estimation is **XGBoost on the backend (B)**. STT is **on-device (A)**; Sarvam is TTS + translate only, proxied by the backend for the demo. No offline/local-cache in the demo.
 
@@ -79,8 +79,8 @@ B copies the JSON examples below into `app/assets/mock/` as mock fixtures. §6 d
 | E23 | POST | `/assistant/ask` | `AssistantRequest` → `AssistantAnswer` (RAG + LLM) | B | A app | M4 |
 | E24 | POST | `/voice/tts` | `{text, lang}` → `audio/wav` bytes (Sarvam) | B | A app | M4 |
 | E25 | POST | `/translate` | `{text, target, source?}` → `{"text","lang"}` (Sarvam; optional) | B | A app | M4 |
-| E26 | GET | `/operators/{id}/training/next?machine_type=` | `TrainingModule` | B | B app | M4 |
-| E27 | POST | `/training/{module_id}/complete` | `{operator_id, score}` → `{"ok": true}` | B | B app | M4 |
+| E26 | GET | `/operators/{id}/training/next?machine_type=` | `TrainingModule` | B | A app | M4 |
+| E27 | POST | `/training/{module_id}/complete` | `{operator_id, score}` → `{"ok": true}` | B | A app | M4 |
 
 **Removed in v2.0:** old `/voice/stt` — speech-to-text now runs **on-device (A)** via the `speech_to_text` plugin.
 
@@ -300,9 +300,9 @@ Server → client, every 1 second while session is `active`. The simulator produ
 
 ## 6. Internal interfaces (code level)
 
-In v2.0 the two halves meet **only inside the Flutter app** (plus the HTTP/WS contract above). The backend is entirely B — Person A writes **no backend code** and imports none. Each owner commits a working stub at M0.
+**v2.1:** the whole Flutter app is **Person A**; the whole backend is **Person B**. The two halves meet **only over HTTP/WS** (§3–§5). The interfaces below are still the intended app structure, but A owns and may evolve all of them; B only needs the HTTP/WS shapes to match.
 
-### 6.1 Flutter — B provides, A uses (never edits)
+### 6.1 Flutter — data layer (A, formerly B)
 
 ```dart
 // lib/core/api/api_client.dart
@@ -322,19 +322,19 @@ final telemetryStreamProvider = StreamProvider.family<Telemetry, String>(...); /
 class TrainingHubScreen extends StatelessWidget { const TrainingHubScreen({required this.operatorId, required this.machineType}); }
 ```
 
-### 6.2 Flutter — A provides, B uses (never edits)
+### 6.2 Flutter — UI (A)
 
 ```dart
 // lib/ui/router.dart
-GoRouter buildRouter();                       // includes route '/training' → B's TrainingHubScreen
+GoRouter buildRouter();                       // includes route '/training' → TrainingHubScreen
 // lib/ui/theme.dart
 class AppTheme { static ThemeData dark(); }
-// lib/ui/widgets/  — BigButton, StatusCard, AlertBanner (B's training screens reuse these)
+// lib/ui/widgets/  — BigButton, StatusCard, AlertBanner (Training Hub reuses these)
 ```
-Training Hub UI text lives in B's `features/training/training_strings.dart` (a per-language map), so B never edits A's ARB files.
+Training Hub UI text: A's choice (ARB files or `features/training/training_strings.dart`). Module content (steps, quiz) comes from B via E26 and is served in English; translation of module content is A's call (E25 available).
 
 ### 6.3 Backend
-No cross-person imports — `backend/` is entirely B. A's on-device edge code (CV, telemetry rules) lives in `app/lib/edge/` and depends only on B's `core/` models + the WS/HTTP contract.
+No cross-person imports — `backend/` is entirely B, `app/` is entirely A. A's on-device edge code (CV, telemetry rules) lives in `app/lib/edge/` and depends only on A's `core/` models + the WS/HTTP contract.
 
 ## 7. Change log
 
@@ -343,3 +343,4 @@ No cross-person imports — `backend/` is entirely B. A's on-device edge code (C
 | v1.0 | M0 | A + B | Initial contract |
 | v1.1 | M0 | A + B | Re-split: A = AI + UI, B = Infra. Added Owner column, §6 internal interfaces, `JobLog` model |
 | v2.0 | M0 | A + B | Edge re-architecture. Safety detection → tablet (A): ML Kit camera CV + telemetry rules; app POSTs alerts (new E18). WS = telemetry only. Checklists + Q&A + briefing → backend RAG (B). Estimator → XGBoost (B). STT → on-device (A); removed `/voice/stt`. Sarvam = TTS + translate proxy (B). Backend now entirely B; §6 meets only in Flutter. Demo langs en/hi/ta; no local cache. Endpoints renumbered E1–E27. |
+| v2.1 | M0 | B (pending A OK) | Ownership only, no API change: **whole Flutter app → A** (project setup, pubspec, main.dart, `core/` data layer + mock/HTTP/WS clients, mock fixtures, Training Hub screens). B = whole backend, no Flutter. E26/E27 caller → A app. §6 reworded accordingly. |
