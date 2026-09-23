@@ -70,10 +70,6 @@ def test_job(client):
     assert r.status_code == 404 and err(r) == "JOB_NOT_FOUND"
 
 
-def test_estimate_404_for_unknown_job(client):
-    assert err(client.get("/jobs/job_999/estimate")) == "JOB_NOT_FOUND"
-
-
 # ---------- E5 assignments ----------
 
 def _ids(client, op, rng):

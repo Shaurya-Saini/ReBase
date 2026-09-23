@@ -168,7 +168,7 @@ class AssignmentCreate(Schema):
 
 class EstimateFactor(Schema):
     name: str
-    effect_pct: float
+    effect_pct: int  # signed %, whole numbers as in the CONTRACT example
     note: str
 
 

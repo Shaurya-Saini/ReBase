@@ -53,6 +53,9 @@ class Settings:
         "EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"
     )
     CHROMA_DIR = str((BACKEND_DIR / os.getenv("CHROMA_DIR", "./data/models/chroma")).resolve())
+    ESTIMATOR_PATH = str(
+        (BACKEND_DIR / os.getenv("ESTIMATOR_PATH", "./data/models/estimator.json")).resolve()
+    )
 
     # Fatigue / rest defaults (placeholders inspired by aviation duty-time rules,
     # not legal limits). Used by E4 and the E10 gate.
