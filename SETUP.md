@@ -94,9 +94,9 @@ If `/health` doesn't load from the other device: both on the same Wi-Fi (not a g
 | Sessions, checklist + critical-defect gate, briefing | E10–E17 | ✅ real (briefing = template until a Gemini key is set, section 5.1) |
 | Live telemetry WebSocket + scenarios | W1, E21, E22 | ✅ real — `ws://<host>:8000/ws/sessions/{id}`, only while the session is `active` |
 | Incident log (alerts), ack | E18–E20 | ✅ real |
-| Assistant Q&A | E23 | ⏳ placeholder answer until B11 |
+| Assistant Q&A (manual RAG + LLM, answers in en/hi/ta) | E23 | ✅ real |
 | Cloud TTS / translate (Sarvam) | E24, E25 | ⏳ TTS returns 503 → app uses on-device TTS; translate echoes the text |
-| Training Hub content | E26, E27 | ⏳ one fixed module until B13 |
+| Training Hub content (12 modules: 4 machines × 3 levels) + quiz result | E26, E27 | ✅ real |
 
 Errors always come back as `{"error": {"code": "...", "message": "..."}}` — e.g. `409 REST_REQUIRED` (Mohit), `422 CRITICAL_DEFECT` (hose leak), `409 INVALID_STATE` (step out of order). Order of a session: `checklist complete → briefing → start → end`.
 
@@ -167,9 +167,9 @@ flutter test                # widget/unit/edge tests
 ## 5. AI / voice keys  [Owner: B]
 
 ### 5.1 Keys
-Fill `SARVAM_API_KEY`, `LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL` in `.env`. Without them, cloud voice/assistant return a clear 503 and everything else still works (STT and default TTS are on-device).
+All keys are optional — the demo runs with none. Speech-to-text and text-to-speech run on the tablet. Without an LLM key the briefing uses a template and the assistant reads the matching English manual section. `SARVAM_API_KEY` is unused for now (Sarvam voices are postponed, B12): `/voice/tts` answers 503 so the app uses its own voice.
 
-**LLM is optional and free.** Default `LLM_PROVIDER=gemini` (Google Gemini free tier, model `gemini-3.8-flash`): get a key at https://aistudio.google.com/apikey and put it in `LLM_API_KEY`. `LLM_PROVIDER=anthropic` also works. With no key, the briefing (E15) uses a built-in template with en/hi/ta phrases — the demo works fully without any LLM key.
+**LLM is optional and free.** Default `LLM_PROVIDER=gemini` (Google Gemini free tier, model `gemini-3.5-flash-lite`, falls back to `gemini-3.8-flash` when busy): get a key at https://aistudio.google.com/apikey and put it in `LLM_API_KEY`. `LLM_PROVIDER=anthropic` also works. **Fallback:** also set `GROQ_API_KEY` (free, console.groq.com) and any Gemini failure (overloaded, quota, timeout) is retried on Groq `openai/gpt-oss-120b` automatically. With no key, the briefing (E15) uses a built-in template with en/hi/ta phrases — the demo works fully without any LLM key.
 
 ### 5.2 Re-train the estimator (after any re-seed)
 ```bash
@@ -179,14 +179,18 @@ cd backend && python -m app.ai.train_estimator   # writes data/models/estimator.
 ### 5.3 Quick checks
 ```bash
 curl -X POST localhost:8000/assistant/ask -H "Content-Type: application/json" \
-  -d '{"machine_id":"mc_001","question":"How do I switch to power mode?","lang":"hi-IN"}'   # RAG Q&A works
+  -d '{"machine_id":"mc_001","question":"पावर मोड में कैसे बदलें?","lang":"hi-IN"}'   # manual Q&A
+# With an LLM key: a Hindi answer + "sources":[{"doc":"excavator_manual.md","section":"4.2 Operating modes"}]
+# Without a key:   Hindi/Tamil questions get "not found in the manual" (they need the LLM to translate);
+#                  English questions get the matching English manual text with "lang":"en-IN"
 curl -X POST localhost:8000/voice/tts -H "Content-Type: application/json" \
-  -d '{"text":"नमस्ते","lang":"hi-IN"}' --output test.wav                                   # Sarvam TTS works
+  -d '{"text":"नमस्ते","lang":"hi-IN"}'   # expect 503 UPSTREAM_UNAVAILABLE until Sarvam (B12) — the app then uses on-device TTS
 ```
 
 ### 5.4 Common errors  [Owner: B]
 | Error | Fix |
 |---|---|
+| Assistant/briefing answers in English or say "not in the manual" for Hindi/Tamil questions | No LLM reachable (no `LLM_API_KEY`, or Gemini free tier overloaded) — the assistant then reads the English manual section. Check the key; retry later |
 | _(fill in as you hit them)_ | |
 
 ## 6. Run the full stack  [Owner: both]

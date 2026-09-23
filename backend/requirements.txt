@@ -9,6 +9,7 @@ httpx>=0.27
 # Backend AI (B6 estimator, B10/B11 RAG)
 google-genai>=2.25      # LLM (default provider: Gemini free tier) for briefing (E15) + assistant (E23)
 anthropic>=1.8          # alternative LLM provider (LLM_PROVIDER=anthropic)
+groq>=1.7               # automatic LLM fallback when GROQ_API_KEY is set (or LLM_PROVIDER=groq)
 xgboost>=2.1
 scikit-learn>=1.5
 chromadb>=0.5

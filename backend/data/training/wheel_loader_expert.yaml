@@ -1,0 +1,14 @@
+id: trn_wl_expert_01
+machine_type: wheel_loader
+level: expert
+title: Wheel loader refresher — brakes, steering and emergencies
+duration_min: 30
+steps:
+  - {kind: text, content: "A short refresher on what to do when brakes or steering fail."}
+  - {kind: text, content: "Brake pressure warning: stop as soon as it is safe, apply the parking brake and don't continue until it is repaired."}
+  - {kind: text, content: "Steering failure: stop with the service brake, apply the parking brake and lower the bucket. The emergency steering pump gives limited steering for a short time only."}
+  - {kind: tip, content: "An articulated loader can tip when turning fast with a load, even for an experienced operator. Slow down before every turn."}
+quiz:
+  - {q: "The brake pressure warning comes on. What do you do?", options: ["Finish the load first", "Stop when safe and apply the parking brake", "Drive faster to the workshop"], answer_index: 1}
+  - {q: "How long does emergency steering last?", options: ["A short time only", "The whole shift", "Until refuelling"], answer_index: 0}
+  - {q: "What makes a loaded articulated loader tip?", options: ["Turning fast", "Economy mode", "Low fuel"], answer_index: 0}

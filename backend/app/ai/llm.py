@@ -2,12 +2,17 @@
 
 Provider comes from LLM_PROVIDER in .env:
 - `gemini`    — Google Gemini API (free tier), key in LLM_API_KEY. Default model
-                `gemini-3.8-flash`.
+                `gemini-3.5-flash-lite` (fast), falls back to `gemini-3.8-flash`.
 - `anthropic` — Claude, key in LLM_API_KEY (or the SDK's own credential
                 resolution). Default model `claude-opus-5`.
-LLM_MODEL overrides the default model. Anything else (or a missing key,
-timeout, refusal, API error) raises `LLMUnavailable`, and every caller has a
-non-LLM fallback — the demo must survive an API outage.
+- `groq`      — Groq (free tier), key in GROQ_API_KEY (or LLM_API_KEY).
+                Default model `openai/gpt-oss-120b`.
+LLM_MODEL overrides the primary's default model.
+
+**Groq is also the automatic fallback:** if GROQ_API_KEY is set and the
+primary provider fails for any reason, the same request goes to Groq.
+If everything fails, `LLMUnavailable` is raised and every caller has a non-LLM
+fallback — the demo must survive an API outage.
 """
 
 import json
@@ -17,55 +22,113 @@ from app.config import settings
 
 log = logging.getLogger(__name__)
 
-DEFAULT_MODELS = {"gemini": "gemini-3.8-flash", "anthropic": "claude-opus-5"}
+DEFAULT_MODELS = {"gemini": "gemini-3.5-flash-lite", "anthropic": "claude-opus-5",
+                  "groq": "openai/gpt-oss-120b"}
+# `fast=True` (simple tasks like translating a question): a quicker model where one exists.
+FAST_MODELS = {"gemini": "gemini-3.5-flash-lite", "groq": "openai/gpt-oss-20b"}
 TIMEOUT_S = 15.0
+GEMINI_TIMEOUT_S = 10.0  # per model attempt; with one fallback ≤ ~20 s per call
+GROQ_TIMEOUT_S = 10.0
 
 
 class LLMUnavailable(Exception):
     pass
 
 
-def complete_json(system: str, prompt: str, schema: dict, max_tokens: int = 2000) -> dict:
-    """One structured-output call. Returns the parsed JSON object matching `schema`."""
-    provider = settings.LLM_PROVIDER
-    call = {"gemini": _gemini, "anthropic": _anthropic}.get(provider)
+def _providers() -> list[str]:
+    """Primary provider, then Groq as fallback when a Groq key is configured."""
+    chain = [settings.LLM_PROVIDER]
+    if settings.GROQ_API_KEY and "groq" not in chain:
+        chain.append("groq")
+    return chain
+
+
+def _model_for(provider: str, fast: bool) -> str:
+    if provider == settings.LLM_PROVIDER and settings.LLM_MODEL:
+        return settings.LLM_MODEL
+    if provider == "groq" and settings.GROQ_MODEL:
+        return settings.GROQ_MODEL
+    return (FAST_MODELS.get(provider) if fast else None) or DEFAULT_MODELS[provider]
+
+
+def _call_one(provider: str, system: str, prompt: str, schema: dict, max_tokens: int, fast: bool) -> dict:
+    call = {"gemini": _gemini, "anthropic": _anthropic, "groq": _groq}.get(provider)
     if call is None:
         raise LLMUnavailable(f"LLM_PROVIDER '{provider}' is not implemented")
-    model = settings.LLM_MODEL or DEFAULT_MODELS[provider]
     try:
-        text = call(model, system, prompt, schema, max_tokens)
-    except LLMUnavailable:
-        raise
+        text = call(_model_for(provider, fast), system, prompt, schema, max_tokens)
+    except LLMUnavailable as e:
+        raise LLMUnavailable(f"{provider}: {e}") from e
     except Exception as e:  # noqa: BLE001 — any SDK/network/credential failure → fallback, never a 500
         raise LLMUnavailable(f"{provider} call failed: {type(e).__name__}: {e}") from e
     try:
         return json.loads(text)
     except json.JSONDecodeError as e:
-        raise LLMUnavailable(f"Model returned invalid JSON: {e}") from e
+        raise LLMUnavailable(f"{provider} returned invalid JSON: {e}") from e
+
+
+def complete_json(system: str, prompt: str, schema: dict, max_tokens: int = 2000, fast: bool = False) -> dict:
+    """One structured-output call. Returns the parsed JSON object matching `schema`.
+    Tries the primary provider, then Groq (if configured). `fast=True` picks the
+    provider's quicker model (ignored when LLM_MODEL / GROQ_MODEL is set)."""
+    errors = []
+    for provider in _providers():
+        try:
+            return _call_one(provider, system, prompt, schema, max_tokens, fast)
+        except LLMUnavailable as e:
+            log.info("llm: %s unavailable (%s)", provider, e)
+            errors.append(str(e))
+    raise LLMUnavailable(" | ".join(errors))
 
 
 # ---------- Gemini (google-genai SDK) ----------
+
+# Free-tier models are sometimes overloaded (503/504) or rate-limited (429): try
+# the next one. Measured 2026-09-24: 3.5-flash-lite ~1-4 s and good Tamil/Hindi
+# answers → default; 3.8-flash ~3-4 s when up but often 503 → fallback;
+# 3.5-flash kept timing out → not used. Set LLM_MODEL to pick a different primary.
+GEMINI_FALLBACKS = ["gemini-3.8-flash"]
+GEMINI_RETRY_CODES = {429, 503, 504}
+# Gemini 3.x can't turn thinking off, only lower it; default is "medium" (slow).
+# 3.8-flash rejects "minimal"; flash-lite already defaults to minimal.
+GEMINI_THINKING = {"gemini-3.8-flash": "low"}
+
 
 def _gemini(model: str, system: str, prompt: str, schema: dict, max_tokens: int) -> str:
     if not settings.LLM_API_KEY:
         raise LLMUnavailable("LLM_API_KEY is empty (get a free key at aistudio.google.com)")
     from google import genai
-    from google.genai import types
+    from google.genai import errors, types
 
     client = genai.Client(
         api_key=settings.LLM_API_KEY,
-        http_options=types.HttpOptions(timeout=int(TIMEOUT_S * 1000)),  # milliseconds
+        # One attempt per model: the SDK's default is 5 attempts with backoff up to 60 s,
+        # which produced ~2-minute calls on an overloaded free tier. We fall back to the
+        # next model ourselves instead.
+        http_options=types.HttpOptions(timeout=int(GEMINI_TIMEOUT_S * 1000),  # milliseconds
+                                       retry_options=types.HttpRetryOptions(attempts=1)),
     )
-    response = client.models.generate_content(
-        model=model,
-        contents=prompt,
-        config=types.GenerateContentConfig(
+    def config(m: str):
+        level = GEMINI_THINKING.get(m)
+        return types.GenerateContentConfig(
             system_instruction=system,
             response_mime_type="application/json",
             response_json_schema=schema,
             max_output_tokens=max_tokens,
-        ),
-    )
+            thinking_config=types.ThinkingConfig(thinking_level=level) if level else None,
+            automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
+        )
+
+    models = [model] + [m for m in GEMINI_FALLBACKS if m != model]
+    for i, m in enumerate(models):
+        try:
+            response = client.models.generate_content(model=m, contents=prompt, config=config(m))
+            break
+        except errors.APIError as e:
+            if e.code in GEMINI_RETRY_CODES and i < len(models) - 1:
+                log.info("gemini: %s returned %s, trying %s", m, e.code, models[i + 1])
+                continue
+            raise
     text = response.text
     if not text:
         reason = response.candidates[0].finish_reason if response.candidates else "no candidates"
@@ -103,3 +166,29 @@ def _anthropic(model: str, system: str, prompt: str, schema: dict, max_tokens: i
     if text is None:
         raise LLMUnavailable("No text in model response")
     return text
+
+
+# ---------- Groq (official SDK) ----------
+
+def _groq(model: str, system: str, prompt: str, schema: dict, max_tokens: int) -> str:
+    key = settings.GROQ_API_KEY or (settings.LLM_API_KEY if settings.LLM_PROVIDER == "groq" else "")
+    if not key:
+        raise LLMUnavailable("GROQ_API_KEY is empty")
+    from groq import Groq
+
+    client = Groq(api_key=key, timeout=GROQ_TIMEOUT_S, max_retries=0)  # we fall back ourselves
+    response = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
+        # Strict mode: constrained decoding, guaranteed to match the schema.
+        response_format={"type": "json_schema",
+                         "json_schema": {"name": "result", "strict": True, "schema": schema}},
+        max_completion_tokens=max_tokens,
+        reasoning_effort="low",  # gpt-oss is a reasoning model; low keeps it fast
+    )
+    choice = response.choices[0]
+    if choice.finish_reason == "length":
+        raise LLMUnavailable("Groq output truncated")
+    if not choice.message.content:
+        raise LLMUnavailable(f"Groq returned no text ({choice.finish_reason})")
+    return choice.message.content

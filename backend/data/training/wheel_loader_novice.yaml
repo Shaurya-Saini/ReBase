@@ -1,0 +1,16 @@
+id: trn_wl_novice_01
+machine_type: wheel_loader
+level: novice
+title: Wheel loader basics before your shift
+duration_min: 45
+steps:
+  - {kind: text, content: "This recap covers the loader's controls, the articulation zone and carrying loads safely."}
+  - {kind: text, content: "Loader joystick: pull back to raise the lift arms, push forward to lower them. Left curls the bucket back, right dumps. Pushed fully forward into the detent, the arms float and the bucket follows the ground."}
+  - {kind: tip, content: "Stay out of the articulation zone between the front and rear frames: it closes when the loader steers."}
+  - {kind: text, content: "Remove the articulation lock bar and store it before you drive. The machine cannot steer while it is fitted."}
+  - {kind: text, content: "Carry the bucket low, about 40 cm above the ground, curled back. Keep below 10 km/h with a full bucket and slow down before turns."}
+  - {kind: text, content: "You reverse a lot: check mirrors and the rear camera every time. The reverse alarm must work."}
+quiz:
+  - {q: "How high should you carry a loaded bucket when travelling?", options: ["About 40 cm above the ground", "Fully raised", "Touching the ground"], answer_index: 0}
+  - {q: "Why must people stay out of the articulation zone?", options: ["It gets hot", "It closes when the loader steers", "The radio does not work there"], answer_index: 1}
+  - {q: "What must you do with the articulation lock bar before driving?", options: ["Tighten it", "Remove and store it", "Paint it"], answer_index: 1}

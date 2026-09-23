@@ -1,0 +1,16 @@
+id: trn_dt_novice_01
+machine_type: dump_truck
+level: novice
+title: Dump truck basics before your shift
+duration_min: 45
+steps:
+  - {kind: text, content: "This recap covers haul-road rules, being loaded and tipping safely."}
+  - {kind: text, content: "Follow the site speed limits and keep at least 50 m from the vehicle in front on haul roads."}
+  - {kind: text, content: "Being loaded: stop where the loader operator signals, apply the parking brake and stay in the cab."}
+  - {kind: text, content: "Tipping: stop on firm, level ground with the truck straight, apply the parking brake and raise the body slowly. Drive forward only after the load has slid out, then lower the body fully."}
+  - {kind: tip, content: "Never raise the body on a slope, near power lines or in strong wind — and never drive with the body up."}
+  - {kind: text, content: "Use the retarder and a lower gear on every downhill ramp to save the brakes."}
+quiz:
+  - {q: "Minimum following distance on haul roads?", options: ["10 m", "50 m", "200 m"], answer_index: 1}
+  - {q: "Where do you stay while being loaded?", options: ["In the cab", "Beside the truck", "On the loader"], answer_index: 0}
+  - {q: "Where may you raise the body?", options: ["On a slope", "On firm, level ground", "Under a power line"], answer_index: 1}

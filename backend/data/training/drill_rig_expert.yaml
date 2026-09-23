@@ -1,0 +1,14 @@
+id: trn_dr_expert_01
+machine_type: drill_rig
+level: expert
+title: Drill rig refresher — stuck strings and overheating
+duration_min: 30
+steps:
+  - {kind: text, content: "A short refresher on freeing a stuck string and handling temperature warnings."}
+  - {kind: text, content: "Stuck drill string: stop percussion, reverse rotation slowly while pulling back with low feed. Don't use full force — the rods can break. If it stays stuck, stop and report it."}
+  - {kind: text, content: "Hydraulic oil above 95 °C: reduce percussion and let the rig cool at idle. Above 105 °C stop drilling and report it."}
+  - {kind: tip, content: "Compressor temperature warning: stop drilling and let the compressor run unloaded to cool down."}
+quiz:
+  - {q: "First step with a stuck drill string?", options: ["Full feed force", "Stop percussion", "Raise the mast"], answer_index: 1}
+  - {q: "Hydraulic oil at 107 °C. What do you do?", options: ["Stop drilling and report it", "Increase percussion", "Ignore it"], answer_index: 0}
+  - {q: "Compressor temperature warning — what then?", options: ["Keep drilling", "Stop drilling, run the compressor unloaded", "Switch off the dust collector"], answer_index: 1}

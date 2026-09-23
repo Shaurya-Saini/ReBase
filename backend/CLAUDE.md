@@ -17,7 +17,6 @@ backend/
 │   ├── seed.py                `python -m app.seed` → wipe + refill DB (incl. ~60 JobLog rows)
 │   ├── schemas.py             API request/response shapes = CONTRACT §2 enums + §4 schemas
 │   ├── errors.py              ApiError + handlers → {"error": {"code", "message"}} (§1)
-│   ├── stub_data.py           B0 stubs (§4 examples verbatim); delete entries as routes go real
 │   ├── routers/               operators (incl. /auth/login), machines, jobs, assignments, sessions,
 │   │                          checklist, alerts, training, sim, ws   (assistant + voice live in ai/)
 │   ├── services/

@@ -49,6 +49,9 @@ class Settings:
     LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini")
     LLM_API_KEY = os.getenv("LLM_API_KEY", "")
     LLM_MODEL = os.getenv("LLM_MODEL", "")
+    # Groq: automatic fallback when the primary LLM fails (or the primary with LLM_PROVIDER=groq)
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+    GROQ_MODEL = os.getenv("GROQ_MODEL", "")
     EMBEDDING_MODEL = os.getenv(
         "EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"
     )
