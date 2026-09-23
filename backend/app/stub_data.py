@@ -44,17 +44,6 @@ ASSIGNMENT = {
     "machine": MACHINE,
 }
 
-ESTIMATE = {
-    "job_id": "job_001",
-    "estimated_hours": 6.8,
-    "range_hours": [5.9, 7.6],
-    "factors": [
-        {"name": "weather", "effect_pct": 8, "note": "Light rain forecast"},
-        {"name": "operator_experience", "effect_pct": -5, "note": "Expert on excavator"},
-    ],
-    "project_completion_date": "2026-10-18",
-}
-
 SESSION = {
     "id": "ses_001",
     "operator_id": "op_001",

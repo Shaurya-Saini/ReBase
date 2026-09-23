@@ -18,11 +18,6 @@ def test_tables_created(client):
             "trainingcompletion"} <= tables
 
 
-def test_e8_estimate(client):
-    est = client.get("/jobs/job_001/estimate").json()
-    assert est["range_hours"] == [5.9, 7.6] and len(est["factors"]) == 2
-
-
 def test_e10_to_e17_session_flow(client):
     body = {"operator_id": "op_001", "machine_id": "mc_001", "job_id": "job_001"}
     r = client.post("/sessions", json=body)

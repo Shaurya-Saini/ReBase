@@ -28,6 +28,7 @@ from app.schemas import Health
 async def lifespan(_: FastAPI):
     create_db()
     _seed_if_empty()
+    _train_estimator_if_missing()
     # TODO B8: start simulator · TODO B10: warm RAG store
     yield
 
@@ -42,6 +43,21 @@ def _seed_if_empty() -> None:
     with Session(engine) as db:
         if db.exec(select(Operator)).first() is None:
             seed(engine)
+
+
+def _train_estimator_if_missing() -> None:
+    """Fresh clone convenience: train the XGBoost estimator (< 1 s) if absent.
+    On any failure E8 just uses its formula fallback."""
+    from pathlib import Path
+
+    if Path(settings.ESTIMATOR_PATH).exists():
+        return
+    try:
+        from app.ai.train_estimator import train
+
+        train(engine, verbose=False)
+    except Exception as e:  # noqa: BLE001
+        print(f"[startup] estimator training skipped ({e}); E8 uses the fallback formula")
 
 
 app = FastAPI(title="ReBase API", version=settings.VERSION, lifespan=lifespan)

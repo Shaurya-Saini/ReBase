@@ -40,7 +40,8 @@ pip install -r requirements.txt                      # fastapi, xgboost, chromad
 ### 3.2 Seed the database + build models
 ```bash
 python -m app.seed                       # wipes and refills backend/rebase.db with demo data (incl. ~60 JobLog rows)
-python -m app.ai.train_estimator         # trains the XGBoost time estimator → data/models/estimator.json
+python -m app.ai.train_estimator         # trains the XGBoost time estimator → data/models/estimator.json (prints CV error vs planned-hours baseline)
+# Both steps also run automatically on server start if the DB is empty / the model file is missing.
 # The RAG vector store builds itself on first server start (ingests data/manuals/ into data/models/chroma/).
 ```
 Re-seed right before a demo: all dates and work hours are relative to when the seed runs. (If the DB is empty, the server seeds it automatically on startup.)
