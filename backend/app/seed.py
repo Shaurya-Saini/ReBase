@@ -127,7 +127,9 @@ def _work_history(now: datetime, today: date) -> list[tuple[str, datetime, datet
         out.append((op, start, start + timedelta(hours=hours)))
 
     # Ravi: 5 × 7.5 h on previous days + 3.5 h today ending 1 h ago → ~41 h, ok.
-    for d, h in [(1, 7.5), (2, 7.5), (3, 7.5), (5, 7.5), (6, 7.5)]:
+    # Yesterday is his day off, so today's work never merges with the previous
+    # shift (>= MIN_REST_HOURS gap) whatever time the seed runs.
+    for d, h in [(2, 7.5), (3, 7.5), (4, 7.5), (5, 7.5), (6, 7.5)]:
         day_shift("op_001", d, h)
     out.append(("op_001", now - timedelta(hours=4.5), now - timedelta(hours=1)))
 

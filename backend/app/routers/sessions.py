@@ -1,16 +1,29 @@
 """E10 create, E11 get, E15 briefing, E16 start, E17 end. Stubbed (B0) — real in B7."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlmodel import Session as DbSession
 
-from app import stub_data
+from app import models, stub_data
+from app.db import get_db
+from app.errors import ApiError
 from app.schemas import Briefing, Lang, Session, SessionCreate, SessionSummary
+from app.services.fatigue import operator_fatigue
+from app.views import get_or_404
 
 router = APIRouter(tags=["sessions"])
 
 
 @router.post("/sessions", response_model=Session, status_code=201)
-def create_session(body: SessionCreate):
-    # TODO B7 + B3: 409 REST_REQUIRED fatigue gate
+def create_session(body: SessionCreate, db: DbSession = Depends(get_db)):
+    op = get_or_404(db, models.Operator, body.operator_id)
+    rest = operator_fatigue(db, op).rest
+    if rest["status"] == "must_rest":
+        nxt = rest["next_allowed_start"]
+        raise ApiError(
+            409, "REST_REQUIRED", rest["reason"],
+            next_allowed_start=nxt.isoformat().replace("+00:00", "Z") if nxt else None,
+        )
+    # TODO B7: persist the session (machine/job checks, ses_ id)
     return {**stub_data.SESSION, **body.model_dump()}
 
 
