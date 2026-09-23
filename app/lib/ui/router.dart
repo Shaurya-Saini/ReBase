@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:app/features/login/login_screen.dart';
@@ -11,7 +12,11 @@ import 'package:app/features/assistant/assistant_screen.dart';
 // B provides this screen (CONTRACT §6.1); the route lives here because A owns the router.
 import 'package:app/features/training/training_hub_screen.dart';
 
-/// A owns navigation (CONTRACT §6.2). B's `main.dart` calls `buildRouter()`.
+/// Created once and shared (via `routerProvider`) so rebuilds — e.g. on a
+/// language change — do NOT recreate the router and reset the navigation stack.
+final routerProvider = Provider<GoRouter>((ref) => buildRouter());
+
+/// A owns navigation (CONTRACT §6.2). Built once through `routerProvider`.
 GoRouter buildRouter() {
   return GoRouter(
     initialLocation: '/',

@@ -31,7 +31,7 @@ class BriefingScreen extends ConsumerWidget {
           async.maybeWhen(
             data: (b) => IconButton(
               icon: const Icon(Icons.volume_up),
-              tooltip: 'Read aloud',
+              tooltip: t.action_read_aloud,
               onPressed: () => ref.read(ttsProvider).speak(_speech(b), b.lang),
             ),
             orElse: () => const SizedBox.shrink(),
@@ -44,16 +44,16 @@ class BriefingScreen extends ConsumerWidget {
         data: (b) => ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            _section(context, Icons.precision_manufacturing, 'Machine',
+            _section(context, Icons.precision_manufacturing, t.briefing_machine,
                 b.machineSummary),
-            _section(context, Icons.work, 'Job', b.jobSummary),
+            _section(context, Icons.work, t.briefing_job, b.jobSummary),
             if (b.estimatedHours != null)
               _section(context, Icons.timer, t.job_estimate,
                   '${b.estimatedHours!.toStringAsFixed(1)} h'),
-            _listSection(context, Icons.warning_amber, 'Hazards', b.hazards,
-                AppTheme.warning),
-            _listSection(
-                context, Icons.info, 'Reminders', b.reminders, AppTheme.info),
+            _listSection(context, Icons.warning_amber, t.briefing_hazards,
+                b.hazards, AppTheme.warning),
+            _listSection(context, Icons.info, t.briefing_reminders, b.reminders,
+                AppTheme.info),
             const SizedBox(height: 16),
             BigButton(
               label: t.action_start_work,

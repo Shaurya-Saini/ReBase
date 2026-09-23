@@ -30,7 +30,6 @@ class AppTheme {
         primary: const Color(0xFFFFC107),
         error: critical,
       ),
-      textTheme: base.textTheme.apply(fontSizeFactor: 1.15),
       appBarTheme:
           const AppBarTheme(backgroundColor: surface, centerTitle: false),
       cardTheme: const CardThemeData(color: surface, margin: EdgeInsets.all(8)),

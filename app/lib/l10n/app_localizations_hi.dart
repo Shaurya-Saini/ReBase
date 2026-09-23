@@ -120,4 +120,103 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get alert_unsafe_operation => 'असुरक्षित संचालन पाया गया';
+
+  @override
+  String get range_day => 'दिन';
+
+  @override
+  String get range_week => 'सप्ताह';
+
+  @override
+  String get range_month => 'महीना';
+
+  @override
+  String get common_status => 'स्थिति';
+
+  @override
+  String get common_on => 'चालू';
+
+  @override
+  String get common_off => 'बंद';
+
+  @override
+  String get common_ok => 'ठीक है';
+
+  @override
+  String get job_planned => 'नियोजित';
+
+  @override
+  String get job_project_completion => 'परियोजना पूर्णता';
+
+  @override
+  String get checklist_based_on => 'आधारित';
+
+  @override
+  String get chk_ok => 'ठीक';
+
+  @override
+  String get chk_defect => 'खराबी';
+
+  @override
+  String get chk_na => 'लागू नहीं';
+
+  @override
+  String get chk_critical => 'गंभीर';
+
+  @override
+  String get checklist_answer_all => 'पहले सभी आइटम भरें';
+
+  @override
+  String get briefing_machine => 'मशीन';
+
+  @override
+  String get briefing_job => 'कार्य';
+
+  @override
+  String get briefing_hazards => 'खतरे';
+
+  @override
+  String get briefing_reminders => 'अनुस्मारक';
+
+  @override
+  String get action_read_aloud => 'ज़ोर से पढ़ें';
+
+  @override
+  String get live_summary_title => 'सत्र सारांश';
+
+  @override
+  String get live_duration => 'अवधि';
+
+  @override
+  String get live_alerts => 'अलर्ट';
+
+  @override
+  String get live_idle => 'निष्क्रिय';
+
+  @override
+  String get gauge_rpm => 'आरपीएम';
+
+  @override
+  String get gauge_temp => 'तापमान';
+
+  @override
+  String get gauge_fuel => 'ईंधन';
+
+  @override
+  String get gauge_load => 'भार';
+
+  @override
+  String get gauge_speed => 'गति';
+
+  @override
+  String get gauge_proximity => 'निकटता';
+
+  @override
+  String get gauge_idle => 'निष्क्रिय';
+
+  @override
+  String get gauge_seatbelt => 'सीट बेल्ट';
+
+  @override
+  String get assistant_source => 'स्रोत';
 }

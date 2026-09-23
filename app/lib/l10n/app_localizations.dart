@@ -327,6 +327,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unsafe operation detected'**
   String get alert_unsafe_operation;
+
+  /// No description provided for @range_day.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get range_day;
+
+  /// No description provided for @range_week.
+  ///
+  /// In en, this message translates to:
+  /// **'Week'**
+  String get range_week;
+
+  /// No description provided for @range_month.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get range_month;
+
+  /// No description provided for @common_status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get common_status;
+
+  /// No description provided for @common_on.
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get common_on;
+
+  /// No description provided for @common_off.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get common_off;
+
+  /// No description provided for @common_ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get common_ok;
+
+  /// No description provided for @job_planned.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned'**
+  String get job_planned;
+
+  /// No description provided for @job_project_completion.
+  ///
+  /// In en, this message translates to:
+  /// **'Project completion'**
+  String get job_project_completion;
+
+  /// No description provided for @checklist_based_on.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on'**
+  String get checklist_based_on;
+
+  /// No description provided for @chk_ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get chk_ok;
+
+  /// No description provided for @chk_defect.
+  ///
+  /// In en, this message translates to:
+  /// **'Defect'**
+  String get chk_defect;
+
+  /// No description provided for @chk_na.
+  ///
+  /// In en, this message translates to:
+  /// **'N/A'**
+  String get chk_na;
+
+  /// No description provided for @chk_critical.
+  ///
+  /// In en, this message translates to:
+  /// **'CRITICAL'**
+  String get chk_critical;
+
+  /// No description provided for @checklist_answer_all.
+  ///
+  /// In en, this message translates to:
+  /// **'Answer all items first'**
+  String get checklist_answer_all;
+
+  /// No description provided for @briefing_machine.
+  ///
+  /// In en, this message translates to:
+  /// **'Machine'**
+  String get briefing_machine;
+
+  /// No description provided for @briefing_job.
+  ///
+  /// In en, this message translates to:
+  /// **'Job'**
+  String get briefing_job;
+
+  /// No description provided for @briefing_hazards.
+  ///
+  /// In en, this message translates to:
+  /// **'Hazards'**
+  String get briefing_hazards;
+
+  /// No description provided for @briefing_reminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get briefing_reminders;
+
+  /// No description provided for @action_read_aloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Read aloud'**
+  String get action_read_aloud;
+
+  /// No description provided for @live_summary_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Session summary'**
+  String get live_summary_title;
+
+  /// No description provided for @live_duration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get live_duration;
+
+  /// No description provided for @live_alerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts'**
+  String get live_alerts;
+
+  /// No description provided for @live_idle.
+  ///
+  /// In en, this message translates to:
+  /// **'Idle'**
+  String get live_idle;
+
+  /// No description provided for @gauge_rpm.
+  ///
+  /// In en, this message translates to:
+  /// **'RPM'**
+  String get gauge_rpm;
+
+  /// No description provided for @gauge_temp.
+  ///
+  /// In en, this message translates to:
+  /// **'Temp'**
+  String get gauge_temp;
+
+  /// No description provided for @gauge_fuel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fuel'**
+  String get gauge_fuel;
+
+  /// No description provided for @gauge_load.
+  ///
+  /// In en, this message translates to:
+  /// **'Load'**
+  String get gauge_load;
+
+  /// No description provided for @gauge_speed.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed'**
+  String get gauge_speed;
+
+  /// No description provided for @gauge_proximity.
+  ///
+  /// In en, this message translates to:
+  /// **'Proximity'**
+  String get gauge_proximity;
+
+  /// No description provided for @gauge_idle.
+  ///
+  /// In en, this message translates to:
+  /// **'Idle'**
+  String get gauge_idle;
+
+  /// No description provided for @gauge_seatbelt.
+  ///
+  /// In en, this message translates to:
+  /// **'Seatbelt'**
+  String get gauge_seatbelt;
+
+  /// No description provided for @assistant_source.
+  ///
+  /// In en, this message translates to:
+  /// **'Source'**
+  String get assistant_source;
 }
 
 class _AppLocalizationsDelegate

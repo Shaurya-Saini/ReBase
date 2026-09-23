@@ -108,6 +108,7 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
   }
 
   Widget _bubble(_Msg m) {
+    final t = AppLocalizations.of(context)!;
     if (m.isQuestion) {
       return Align(
         alignment: Alignment.centerRight,
@@ -135,7 +136,7 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(
-                    'Source: ${a.sources.map((s) => s.section).join(", ")}',
+                    '${t.assistant_source}: ${a.sources.map((s) => s.section).join(", ")}',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
@@ -143,7 +144,7 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
                 alignment: Alignment.centerRight,
                 child: IconButton(
                   icon: const Icon(Icons.volume_up),
-                  tooltip: 'Read aloud',
+                  tooltip: t.action_read_aloud,
                   onPressed: () =>
                       ref.read(ttsProvider).speak(a.answer, a.lang),
                 ),

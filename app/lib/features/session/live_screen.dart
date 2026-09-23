@@ -13,7 +13,6 @@ import 'package:app/l10n/app_localizations.dart';
 import 'package:app/ui/alert_text.dart';
 import 'package:app/ui/theme.dart';
 import 'package:app/ui/widgets/alert_banner.dart';
-import 'package:app/ui/widgets/status_card.dart';
 
 /// A7 — live session: telemetry gauges from the stream fed into the on-device
 /// rule engine (A8); alerts post to the incident log (E18) and show as a banner.
@@ -67,16 +66,17 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     final summary =
         await ref.read(apiClientProvider).endSession(widget.sessionId);
     if (!mounted) return;
+    final t = AppLocalizations.of(context)!;
     await showDialog<void>(
       context: context,
       builder: (c) => AlertDialog(
-        title: const Text('Session summary'),
-        content: Text('Duration: ${summary.durationHours} h\n'
-            'Alerts: ${summary.alertsTotal} (critical ${summary.alertsCritical})\n'
-            'Idle: ${summary.idleMinutes} min'),
+        title: Text(t.live_summary_title),
+        content: Text('${t.live_duration}: ${summary.durationHours} h\n'
+            '${t.live_alerts}: ${summary.alertsTotal} (⚠ ${summary.alertsCritical})\n'
+            '${t.live_idle}: ${summary.idleMinutes} min'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(c), child: const Text('OK')),
+              onPressed: () => Navigator.pop(c), child: Text(t.common_ok)),
         ],
       ),
     );
@@ -133,37 +133,61 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     );
   }
 
-  Widget _gauges(Telemetry x) => GridView.count(
-        crossAxisCount: 4,
-        childAspectRatio: 1.5,
-        padding: const EdgeInsets.all(8),
-        children: [
-          _tile('RPM', x.engineRpm.toString(), Icons.speed),
-          _tile('Hyd °C', x.hydraulicTempC.toStringAsFixed(0), Icons.thermostat,
-              danger: x.hydraulicTempC > TelemetryThresholds.overheatWarnC),
-          _tile('Fuel %', x.fuelPct.toString(), Icons.local_gas_station),
-          _tile('Load %', x.loadPct.toStringAsFixed(0), Icons.fitness_center,
-              danger: x.loadPct > TelemetryThresholds.overloadWarnPct),
-          _tile('km/h', x.speedKmh.toStringAsFixed(1), Icons.directions_car),
-          _tile(
-              'Prox m', x.proximityM.toStringAsFixed(1), Icons.social_distance,
-              danger: x.proximityM < TelemetryThresholds.proximityWarnM),
-          _tile('Idle s', x.idleSeconds.toString(), Icons.hourglass_empty,
-              danger: x.idleSeconds > TelemetryThresholds.idleWarnSeconds),
-          _tile('Belt', x.seatbelt ? 'On' : 'Off',
-              Icons.airline_seat_recline_normal,
-              danger: !x.seatbelt),
-        ],
-      );
+  Widget _gauges(Telemetry x) {
+    final t = AppLocalizations.of(context)!;
+    return GridView.count(
+      crossAxisCount: 4,
+      childAspectRatio: 1.1,
+      padding: const EdgeInsets.all(8),
+      children: [
+        _tile(t.gauge_rpm, x.engineRpm.toString(), Icons.speed),
+        _tile(
+            t.gauge_temp, x.hydraulicTempC.toStringAsFixed(0), Icons.thermostat,
+            danger: x.hydraulicTempC > TelemetryThresholds.overheatWarnC),
+        _tile(t.gauge_fuel, x.fuelPct.toString(), Icons.local_gas_station),
+        _tile(t.gauge_load, x.loadPct.toStringAsFixed(0), Icons.fitness_center,
+            danger: x.loadPct > TelemetryThresholds.overloadWarnPct),
+        _tile(
+            t.gauge_speed, x.speedKmh.toStringAsFixed(1), Icons.directions_car),
+        _tile(t.gauge_proximity, x.proximityM.toStringAsFixed(1),
+            Icons.social_distance,
+            danger: x.proximityM < TelemetryThresholds.proximityWarnM),
+        _tile(t.gauge_idle, x.idleSeconds.toString(), Icons.hourglass_empty,
+            danger: x.idleSeconds > TelemetryThresholds.idleWarnSeconds),
+        _tile(t.gauge_seatbelt, x.seatbelt ? t.common_on : t.common_off,
+            Icons.airline_seat_recline_normal,
+            danger: !x.seatbelt),
+      ],
+    );
+  }
 
   Widget _tile(String label, String value, IconData icon,
-          {bool danger = false}) =>
-      StatusCard(
-        title: label,
-        value: value,
-        icon: icon,
-        color: danger ? AppTheme.critical : null,
-      );
+      {bool danger = false}) {
+    final color = danger ? AppTheme.critical : null;
+    return Card(
+      margin: const EdgeInsets.all(4),
+      child: Padding(
+        padding: const EdgeInsets.all(6),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 18, color: color),
+            const SizedBox(height: 2),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(value,
+                  style: TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold, color: color)),
+            ),
+            Text(label,
+                style: const TextStyle(fontSize: 10),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
+          ],
+        ),
+      ),
+    );
+  }
 
   /// Mock-only buttons so alerts are demoable without the backend simulator.
   /// (On a real device the camera CV of A9 raises the edge_cv alerts.)
