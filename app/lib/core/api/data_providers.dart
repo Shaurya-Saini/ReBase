@@ -32,3 +32,12 @@ final jobProvider = FutureProvider.autoDispose
 /// XGBoost estimate for a job (A4).
 final estimateProvider = FutureProvider.autoDispose.family<Estimate, String>(
     (ref, jobId) => ref.watch(apiClientProvider).estimate(jobId));
+
+/// Pre-start checklist for a session (A5).
+final checklistProvider = FutureProvider.autoDispose.family<Checklist, String>(
+    (ref, sessionId) => ref.watch(apiClientProvider).checklist(sessionId));
+
+/// Operational briefing for a session in a language (A6).
+final briefingProvider = FutureProvider.autoDispose
+    .family<Briefing, ({String sessionId, String lang})>((ref, a) =>
+        ref.watch(apiClientProvider).briefing(a.sessionId, lang: a.lang));

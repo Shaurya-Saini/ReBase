@@ -17,8 +17,10 @@ dependencies:
   dio: ^5.7.0
   web_socket_channel: ^3.0.1
   intl: any
-  # Edge/voice deps added when A9/A10 are wired (google_mlkit_face_detection,
-  # camera, speech_to_text, flutter_tts) — kept out until then to keep resolution light.
+  flutter_tts: ^4.2.0
+  speech_to_text: ^7.0.0
+  # Edge CV deps added when A9 is wired on device (google_mlkit_face_detection,
+  # camera) — kept out until then to keep resolution light.
 
 dev_dependencies:
   flutter_test:
