@@ -33,7 +33,10 @@ async def lifespan(_: FastAPI):
     _train_estimator_if_missing()
     _restore_simulator()
     sim_task = asyncio.create_task(simulator.run())
-    # TODO B10: warm RAG store
+    if settings.RAG_WARMUP:
+        from app.ai import rag
+
+        rag.warm_in_background()  # loads the embedding model + builds/opens the Chroma store
     yield
     sim_task.cancel()
 

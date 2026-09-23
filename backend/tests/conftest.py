@@ -7,7 +7,10 @@ import pytest
 _tmp = tempfile.mkdtemp(prefix="rebase-test-")
 os.environ["DATABASE_URL"] = f"sqlite:///{_tmp}/test.db"
 os.environ["SIM_TICK_SECONDS"] = "0.01"
-os.environ["LLM_PROVIDER"] = "none"  # tests never call a real LLM; template fallbacks
+os.environ["CHROMA_DIR"] = f"{_tmp}/chroma"  # never touch the dev vector store
+os.environ["RAG_WARMUP"] = "0"  # tests build the store explicitly
+os.environ["LLM_PROVIDER"] = "none"
+os.environ["GROQ_API_KEY"] = ""  # …and never fall back to a real Groq key from .env  # tests never call a real LLM; template fallbacks
 os.environ["ESTIMATOR_PATH"] = f"{_tmp}/estimator.json"  # never touch the dev model
 
 from fastapi.testclient import TestClient  # noqa: E402

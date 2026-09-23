@@ -1,0 +1,14 @@
+id: trn_dt_expert_01
+machine_type: dump_truck
+level: expert
+title: Dump truck refresher — brake failure and hot brakes
+duration_min: 30
+steps:
+  - {kind: text, content: "A short refresher on brake emergencies."}
+  - {kind: text, content: "Brake failure: use the retarder and shift down, steer towards an uphill escape lane or a safety berm, apply the parking brake when slow, and warn others by horn and radio."}
+  - {kind: text, content: "Brake or retarder temperature warning: reduce speed, use a lower gear, and stop on a safe level area to let the brakes cool."}
+  - {kind: tip, content: "Hot brakes come from riding the service brake downhill. Plan ramps with the retarder from the top."}
+quiz:
+  - {q: "Your brakes fail on a downhill. Where do you steer?", options: ["An uphill escape lane or safety berm", "Into the pit", "Towards the loader"], answer_index: 0}
+  - {q: "The brake temperature warning comes on. What do you do?", options: ["Brake harder", "Slow down, lower gear, stop to cool", "Ignore it"], answer_index: 1}
+  - {q: "What causes hot brakes on ramps?", options: ["Riding the service brake", "Using the retarder", "Economy mode"], answer_index: 0}

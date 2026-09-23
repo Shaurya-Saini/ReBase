@@ -1,0 +1,16 @@
+id: trn_dr_novice_01
+machine_type: drill_rig
+level: novice
+title: Drill rig basics before your shift
+duration_min: 45
+steps:
+  - {kind: text, content: "This recap covers staying safe around the drill string and the bench edge, and setting up over a hole."}
+  - {kind: text, content: "Keep people at least 5 m from the drill string. Never reach into the rotation area while the drill runs."}
+  - {kind: text, content: "Bench edges: keep the tracks at least 3 m from the edge, more if the ground is broken. Never tram along the edge with the mast raised."}
+  - {kind: text, content: "Setting up: tram to the hole with the mast lowered, level the rig on its jacks, raise and align the mast, check the centralizer holds the rod straight."}
+  - {kind: tip, content: "Test both emergency stop buttons — in the cab and on the drill deck — during the pre-start check."}
+  - {kind: text, content: "Outside the cab while drilling, wear hearing protection, safety glasses and a dust mask."}
+quiz:
+  - {q: "Minimum distance for people from the drill string?", options: ["1 m", "5 m", "20 m"], answer_index: 1}
+  - {q: "How close may the tracks come to the bench edge?", options: ["At least 3 m away", "1 m away", "Right to the edge"], answer_index: 0}
+  - {q: "Mast position when tramming to a hole?", options: ["Raised", "Lowered", "Doesn't matter"], answer_index: 1}
