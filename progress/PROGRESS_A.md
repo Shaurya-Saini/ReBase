@@ -1,32 +1,33 @@
-# Progress — Person A (AI + UI)
+# Progress — Person A (Edge AI + UI)
 
 > Only Person A edits this file. Person B reads it.
 > Status: ⬜ todo · 🟨 doing · ✅ done (matches CONTRACT, tested, works on real API) · 🟦 done on mock/stub only · ⛔ blocked · ➡️ moved
+> Person A writes **no backend code** in v2.0. All screens + on-device intelligence.
 
-**Last updated:** —  **Current milestone:** M0  **Contract version in use:** v1.1
+**Last updated:** —  **Current milestone:** M0  **Contract version in use:** v2.0
 
 ## Tasks
 
-| ID | Task | Side | Endpoints / uses | Milestone | Status | Notes |
-|---|---|---|---|---|---|---|
-| A0 | Stubs: `ai/router.py` + `ai/api.py` (contract examples); `ui/theme.dart` + `ui/router.dart` + placeholder screens | Both | — | M0 | ⬜ | Blocks B at M0 — do first |
-| A1 | Theme + shared widgets (BigButton, StatusCard, AlertBanner) | App | — | M1 | ⬜ | |
-| A2 | Login (operator picker, PIN, language picker) + mode switch | App | E2, E3 | M1 | ⬜ | |
-| A3 | Unmounted dashboard: today / week / month + hours & rest card | App | E4, E5 | M1 | ⬜ | Move candidate → B |
-| A4 | Checklist YAMLs for 4 machine types (based on MSHA 56.14100 / ISO 20474 / OEM walk-around) + `load_checklist()` | Backend | used by E12 | M1 | ⬜ | |
-| A5 | Estimator: train on `JobLog`, fallback formula, E8 + job detail screen | Both | E7, E8 | M2 | ⬜ | Needs B1 seed |
-| A6 | Pre-start checklist screen with defect gating | App | E10–E14 | M3 | ⬜ | |
-| A7 | Briefing generation (LLM + template fallback) E15 + briefing screen | Both | E15 | M3 | ⬜ | |
-| A8 | Live session screen: gauges, alert banner, sound/vibration, ack, end summary | App | W1, E16–E19 | M3 | ⬜ | Gauges = move candidate → B |
-| A9 | Synthetic manuals + BM25 + LLM Q&A with sources (E20) + assistant chat screen | Both | E20 | M4 | ⬜ | |
-| A10 | Sarvam proxy: STT, TTS, translate (E21, E22) | Backend | E21, E22 | M4 | ⬜ | |
-| A11 | Voice loop in app: hold-to-talk → STT → ask → TTS; briefing read-aloud | App | E20–E22 | M4 | ⬜ | |
-| A12 | l10n: en, hi, ta, te ARB files, incl. alert texts by type | App | — | M4 | ⬜ | |
-| A13 | Tests (`tests/ai`, widget tests) + SETUP "AI services" section | Both | — | M5 | ⬜ | |
-| A14 | Stretch: on-device drowsiness check (tablet camera face detection) | App | — | Stretch | ⬜ | Only after M4 |
+| ID | Task | Endpoints / uses | Milestone | Status | Notes |
+|---|---|---|---|---|---|
+| A0 | Stubs: `ui/theme.dart` (`AppTheme.dark()`), `ui/router.dart` (`buildRouter()` → every route to a placeholder; `/training` → B's `TrainingHubScreen`), empty shared widgets, `edge/` package skeleton | — | M0 | ⬜ | Blocks B at M0 — do first |
+| A1 | Theme + shared widgets (BigButton, StatusCard, AlertBanner) | — | M1 | ⬜ | B's Training Hub reuses these |
+| A2 | Login (operator picker, PIN, language picker) + mounted/unmounted mode switch | E2, E3 | M1 | ⬜ | |
+| A3 | Unmounted dashboard: today / week / month + hours & rest card | E4, E5 | M1 | ⬜ | |
+| A4 | Job detail + estimate screen | E7, E8 | M2 | ⬜ | Reads B's XGBoost estimate |
+| A5 | Pre-start checklist screen: fetch, mark items, defect gating UI, complete | E12–E14 | M3 | ⬜ | Checklist content served by B |
+| A6 | Briefing screen: display + read-aloud (on-device TTS / E24) | E15, E24 | M3 | ⬜ | |
+| A7 | Live session screen: telemetry gauges from WS, alert banner (colour+icon+text+sound/vibration), ack, end summary | W1, E16–E20 | M3 | ⬜ | |
+| A8 | On-device telemetry rule engine (`edge/`): seatbelt/proximity/idle/overheat/overload/unsafe → build `AlertCreate` → POST E18; debounce | W1, E18 | M3 | ⬜ | The "rules moved to frontend" part |
+| A9 | **Edge CV (ML Kit face detection)**: drowsiness/distraction/absence → `AlertCreate` (`source: edge_cv`) → POST E18 | E18 | M4 | ⬜ | Headline demo moment; real front camera |
+| A10 | Voice loop: push-to-talk → on-device STT (`speech_to_text`) → E23 ask → show answer + TTS playback | E23, E24 | M4 | ⬜ | Always show text too |
+| A11 | Assistant chat screen (Q&A UI + sources) | E23 | M4 | ⬜ | |
+| A12 | l10n: en, hi, ta ARB files incl. alert texts by `type`; full-app language switching | — | M4 | ⬜ | Demo langs en/hi/ta |
+| A13 | Tests (`test/features/*`, `test/edge/`) + SETUP "App" / "Edge" sections | — | M5 | ⬜ | |
+| A14 | Stretch: noise-robust capture polish, `te-IN`, on-device DSP | — | Stretch | ⬜ | Only after M4 |
 
 ## Ready for B
-_(e.g. "A0 stubs pushed @ abc123", "load_checklist() real for all 4 types")_
+_(e.g. "A0 theme+router pushed @ abc123", "AlertBanner ready for Training Hub")_
 
 ## Blockers
 _None_

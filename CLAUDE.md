@@ -4,6 +4,8 @@ ReBase is an intelligent **Operator Tablet** for construction/mining equipment o
 This is a **hackathon build (1–3 days)** by **two developers**, each running their own Claude Code on the same repo.
 The #1 goal of this file: both people move fast **in parallel without touching each other's work**.
 
+**Architecture is v2.0 (edge).** Contract is `CONTRACT.md` v2.0. If anything below disagrees with `CONTRACT.md`, the contract wins.
+
 ---
 
 ## 0. Identify who you are working with (do this first)
@@ -11,7 +13,7 @@ The #1 goal of this file: both people move fast **in parallel without touching e
 Each developer creates a gitignored file `CLAUDE.local.md` at the repo root containing exactly one line:
 
 ```
-I am Person A (AI + UI)      ← or →      I am Person B (Infra)
+I am Person A (Edge AI + UI)      ← or →      I am Person B (Infra + Backend AI)
 ```
 
 - If `CLAUDE.local.md` is missing, **ask the human "Are you Person A or Person B?" before doing anything else.**
@@ -24,22 +26,26 @@ I am Person A (AI + UI)      ← or →      I am Person B (Infra)
 | Mode | State | What the tablet does |
 |---|---|---|
 | **Mounted** (docked to machine) | Before session | Identify machine → pre-start checklist (co-pilot style, logged) → operational briefing |
-| | During session | Live telemetry, safety alerts (seatbelt, drowsiness, proximity, idling, unsafe operation), incident log, manual-based Q&A assistant |
+| | During session | Live simulated telemetry, **on-device safety detection** (camera CV: drowsiness/distraction/absence; rules: seatbelt/proximity/idling/overheat/overload/unsafe), incident log, manual-based Q&A assistant |
 | **Unmounted** (personal time) | — | Daily/weekly/monthly assignments, job + project time estimates, hours worked and rest status, Training Hub (30–45 min pre-shift recap) |
 
-**Super points (the demo must show all three):** multilingual UI + voice (Sarvam AI), voice assistant in the operator's first language with noisy-environment handling, Training Hub + in-session assistant.
+**Super points (the demo must show all three):** multilingual UI + voice (en/hi/ta, switchable live), voice assistant in the operator's first language (on-device STT → RAG answer → TTS), Training Hub + in-session assistant, and the standout — **real on-device computer-vision safety alerts**.
 
-All machine data (sensors, cameras, machine ID) is **simulated** by the backend.
+**The v2.0 split of "smart":**
+- **On the tablet (A):** real computer vision (Google ML Kit face detection) for operator-state alerts, plus a threshold **rule engine** over streamed telemetry. On-device STT. This is the "edge" story.
+- **On the backend (B):** the **simulator** invents machine sensor data and streams it; **RAG + vector DB** serves checklists and the manual Q&A assistant; the **LLM** writes briefings; **XGBoost** predicts job time; Sarvam does TTS + translate.
+
+Machine sensors are **simulated** by the backend. The camera CV is **real**, running on the tablet's front camera. There is **no offline mode in the demo** (it's a proof of application, not the shipped product).
 
 ---
 
 ## 2. Who does what
 
-| | **Person A — AI + UI** | **Person B — Infra** |
+| | **Person A — Edge AI + UI** | **Person B — Infra + Backend AI** |
 |---|---|---|
-| In one line | Everything the operator *sees* and everything that is *intelligent* | Everything that *stores, moves and serves* data, plus the Training Hub end to end |
-| Backend | `backend/app/ai/`: Sarvam (speech-to-text, text-to-speech, translate), LLM, manual Q&A, AI estimations + model training, briefing generation, checklist content from standards | FastAPI app, SQLite DB, models, seed data, all core endpoints, sessions + checklist gating, simulator, safety rule engine, WebSocket, fatigue/rest logic, training content + endpoints |
-| Flutter app | All screens except Training Hub, theme, navigation, shared widgets, translations (l10n), voice recording/playback | Project setup, data models, API client (mock + real), WebSocket client, Training Hub screens |
+| In one line | Everything the operator *sees* + everything intelligent that runs *on the tablet* | Everything that *stores, simulates, moves and serves* data, plus all backend AI and the Training Hub |
+| Backend | **None** | FastAPI, SQLite DB, models, seed, all endpoints, sessions + checklist gating + fatigue gate, **simulator + WebSocket**, **RAG (checklists + Q&A)**, briefing (LLM), **XGBoost estimator**, Sarvam proxy (TTS + translate), training content + endpoints |
+| Flutter app | All screens except Training Hub, theme, navigation, shared widgets, translations (l10n) + language switching, voice loop (on-device STT + TTS), **edge CV (ML Kit)**, **on-device telemetry rule engine**, alert posting | Project setup, data models, API client (mock + real), WebSocket client, Training Hub screens |
 
 ---
 
@@ -49,12 +55,17 @@ All machine data (sensors, cameras, machine ID) is **simulated** by the backend.
 |---|---|---|
 | Tablet app | Flutter (Android tablet, landscape), Riverpod, go_router, dio, web_socket_channel | Setup/data: B · Screens: A |
 | Backend | Python 3.11+, FastAPI, SQLModel + SQLite | B |
-| Live data | WebSocket backend → app | B |
-| Simulator | Python module inside the backend process | B |
-| Manual Q&A | BM25 search (`rank_bm25`) over markdown manuals + LLM | A |
-| Estimation model | scikit-learn, trained on seeded job history | A |
-| Voice + translation | Sarvam AI, called **only from the backend** (keys never ship in the app) | A |
-| LLM | Provider set by `LLM_PROVIDER` in `.env` | A |
+| Live data | Backend **simulator** → WebSocket → app (telemetry only) | B |
+| **Edge CV** | **Google ML Kit Face Detection** (`google_mlkit_face_detection`), on-device, pretrained — no training/quantization | A |
+| **On-device STT** | `speech_to_text` plugin (push-to-talk) | A |
+| **On-device TTS** | `flutter_tts` (default, offline); backend Sarvam TTS as optional upgrade | A (app) / B (proxy) |
+| Telemetry rule engine | Plain Dart thresholds on the WS stream (runs on device) | A |
+| **RAG / Q&A + checklists** | Vector DB (**ChromaDB**) + `sentence-transformers` embeddings over markdown manuals + checklist content + LLM | B |
+| **Estimation model** | **XGBoost**, trained on seeded job history | B |
+| Voice + translation | **Sarvam AI** (TTS + translate), called **only from the backend**. Prefer free/on-device where quality allows | B |
+| LLM | Provider set by `LLM_PROVIDER` in `.env` (briefing + Q&A) | B |
+
+**Translation strategy (decided):** static UI text = precompiled **ARB files** (offline, free, A). Dynamic AI text (briefing, Q&A) = **LLM answers directly in the target language** (B); Sarvam `/translate` is a fallback only. This keeps Sarvam optional.
 
 ---
 
@@ -66,23 +77,21 @@ rebase/
 ├── CLAUDE.local.md               PERSONAL – gitignored
 ├── CONTRACT.md                   SHARED  – API + internal code contract (change rules: §6 below)
 ├── SETUP.md                      SHARED  – edit only sections tagged with your letter
-├── .env.example                  B (A asks B to add keys)
+├── .env.example                  B
 ├── docs/DECISIONS.md             SHARED  – append-only
 ├── docs/DEMO.md                  SHARED  – finalized together at M5
 ├── progress/PROGRESS_A.md        A only
 ├── progress/PROGRESS_B.md        B only
 │
-├── backend/                      B  – see backend/CLAUDE.md
-│   ├── requirements.txt          B
-│   ├── requirements-ai.txt       A
-│   ├── app/                      B  (main.py, config, db, models, seed, routers/, services/, simulator/)
-│   │   └── ai/                   A  – see backend/app/ai/CLAUDE.md
+├── backend/                      B (entirely)  – see backend/CLAUDE.md
+│   ├── requirements.txt          B  (fastapi, uvicorn, sqlmodel, xgboost, chromadb, sentence-transformers, pyyaml, pytest, httpx, python-multipart)
+│   ├── app/                      B  (main.py, config, db, models, seed, routers/, services/, simulator/, ai/)
+│   │   └── ai/                   B  – RAG, estimator, briefing, Sarvam proxy – see backend/app/ai/CLAUDE.md
 │   ├── data/training/            B
-│   ├── data/checklists/          A
-│   ├── data/manuals/             A
-│   ├── data/models/              A  (trained model files, gitignored)
-│   ├── tests/infra/              B
-│   └── tests/ai/                 A
+│   ├── data/checklists/          B  (checklist content, ingested by RAG)
+│   ├── data/manuals/             B  (synthetic manuals, embedded in the vector DB)
+│   ├── data/models/              B  (XGBoost model + Chroma store, gitignored)
+│   └── tests/                    B
 │
 └── app/                          see app/CLAUDE.md
     ├── pubspec.yaml              B (A edits only inside the "# >>> A deps" block)
@@ -91,26 +100,27 @@ rebase/
     ├── lib/core/                 B  (config, models, api clients, ws client)
     ├── lib/ui/                   A  (theme, router, shared widgets)
     ├── lib/l10n/                 A
+    ├── lib/edge/                 A  (ML Kit CV, telemetry rule engine, alert dispatch)
     ├── lib/features/training/    B
-    ├── lib/features/<all other>/ A
+    ├── lib/features/<all other>/ A  (login, dashboard, job, session/*, assistant, voice)
     ├── test/core/ + test/features/training/   B
-    └── test/features/<others>/   A
+    └── test/features/<others>/ + test/edge/   A
 ```
 
-Both may **read** everything. Nobody edits a path owned by the other.
+Both may **read** everything. Nobody edits a path owned by the other. Person A writes **no backend code** in v2.0.
 
 ---
 
 ## 5. Golden rules (non-negotiable)
 
 1. **Only edit paths you own** (§4). Need something from your partner? Add it under "Requests for partner" in *your own* progress file and tell your human to ping them. Never "quickly fix" their code.
-2. **`CONTRACT.md` is the only source of truth** for HTTP endpoints, WebSocket messages **and** the internal code interfaces between the two halves (Python functions and Flutter providers, `CONTRACT.md` §6). If code and contract disagree, the code is wrong.
+2. **`CONTRACT.md` is the only source of truth** for HTTP endpoints, WebSocket messages **and** the internal Flutter interfaces between the two halves (`CONTRACT.md` §6). If code and contract disagree, the code is wrong.
 3. **Build against stubs, not against your partner.** At M0 each person commits stubs for everything the other imports (see `CONTRACT.md` §6). Stubs return the contract example data. Replace the inside later — never change the signature without the contract protocol.
 4. **Shared files with blocks** (`pubspec.yaml`): only edit inside your own marked block. Git merges separate blocks automatically.
 5. **Small commits, pull often.** `git pull --rebase` before starting any task and before every push.
 6. **No secrets in git.** Keys live in `.env` (gitignored).
 7. **Demo-first.** Every feature must be triggerable on demand in the demo.
-8. **New dependency = one line in `docs/DECISIONS.md`.** A adds Python deps to `requirements-ai.txt`, Flutter deps inside the A block of `pubspec.yaml`.
+8. **New dependency = one line in `docs/DECISIONS.md`.** B adds Python deps to `requirements.txt`; A adds Flutter deps inside the A block of `pubspec.yaml`.
 9. **When unsure about scope, pick the simpler option** and log it. Do not stall.
 
 ---
@@ -119,7 +129,7 @@ Both may **read** everything. Nobody edits a path owned by the other.
 
 1. Proposer describes the change to their human, who confirms with the partner (a chat message is enough).
 2. Proposer edits `CONTRACT.md` in a **separate commit** `contract: <what changed>` and adds a change-log row (bump version).
-3. **Additive** changes (new optional field, new endpoint, new function) may go in right away. **Breaking** changes (rename, remove, type/signature change) need the partner's explicit OK first.
+3. **Additive** changes (new optional field, new endpoint, new method) may go in right away. **Breaking** changes (rename, remove, type/signature change) need the partner's explicit OK first.
 4. After pulling a contract change, each side updates its own code in its own paths.
 
 ---
@@ -131,14 +141,14 @@ Both may **read** everything. Nobody edits a path owned by the other.
 2. `git pull --rebase`.
 3. Read `CONTRACT.md`, your own progress file, and your partner's (read-only — look for "Requests for partner" addressed to you and newly ✅ items you can integrate).
 4. Read the sub-folder guides for the paths you will touch:
-   - A: `backend/app/ai/CLAUDE.md`, `app/CLAUDE.md`
-   - B: `backend/CLAUDE.md`, `app/CLAUDE.md`
+   - A: `app/CLAUDE.md`
+   - B: `backend/CLAUDE.md`, `backend/app/ai/CLAUDE.md`, `app/CLAUDE.md`
 5. Tell the human: current milestone, next task ID, and any requests waiting.
 
 **During work**
 - One task ID at a time; mark it 🟨 when starting.
 - Run tests / `flutter analyze` before committing.
-- Commit message format: `A9: BM25 manual search` / `B7: simulator scenarios`.
+- Commit message format: `A7: live session screen` / `B10: RAG checklist serving`.
 
 **At session end (or every ~2 hours)**
 1. Update your progress file (statuses, "Last updated", blockers, requests).
@@ -163,14 +173,14 @@ At every milestone both stop, pull `main`, run the full stack together, and upda
 
 | Milestone | Target (~36h build) | Done when |
 |---|---|---|
-| **M0 – Kickoff** | Hour 0–1, together | `CONTRACT.md` frozen. **B:** backend skeleton, DB models, `get_db`, Flutter project, `main.dart`, core providers stubbed. **A:** `ai/` router + `ai/api.py` stubs, `ui/theme.dart` + `ui/router.dart` stubs. Both `CLAUDE.local.md` created |
-| **M1 – Standalone** | ~Hour 8 | B: core API + seed + mock API client work. A: all main screens navigable on mock data, checklist content ready |
-| **M2 – Unmounted E2E** | ~Hour 14 | App on real backend: login → assignments → estimate (real model) → rest status |
-| **M3 – Mounted E2E** | ~Hour 22 | Start session → checklist → briefing → live telemetry → alert → ack → end |
-| **M4 – Super points** | ~Hour 30 | Voice Q&A in ≥2 Indian languages, multilingual UI, Training Hub with quiz |
+| **M0 – Kickoff** | Hour 0–1, together | `CONTRACT.md` v2.0 frozen. **B:** backend skeleton, DB models (incl. `JobLog`), `get_db`, all routers stubbed, Flutter project, `main.dart`, `core/` providers + `ApiClient`/`MockApiClient` + `telemetryStreamProvider` stubbed, placeholder `TrainingHubScreen`. **A:** `ui/theme.dart` + `ui/router.dart` + placeholder screens, empty shared widgets, `edge/` package skeleton. Both `CLAUDE.local.md` created |
+| **M1 – Standalone** | ~Hour 8 | B: core API + seed + mock API client + fake telemetry stream work. A: all main screens navigable on mock data |
+| **M2 – Unmounted E2E** | ~Hour 14 | App on real backend: login → assignments → estimate (real XGBoost) → rest status |
+| **M3 – Mounted E2E** | ~Hour 22 | Start session → checklist (backend) → briefing → live telemetry → **on-device telemetry-rule alert** → ack → end. Alerts logged via E18 |
+| **M4 – Super points** | ~Hour 30 | **Real camera CV alert (ML Kit)** live; voice Q&A (on-device STT → RAG answer → TTS) in ≥2 languages; multilingual UI switching (en/hi/ta); Training Hub with quiz |
 | **M5 – Freeze + demo** | Last 4–6 hours | Bug fixes only, `SETUP.md` tested from a fresh clone, `DEMO.md` rehearsed twice |
 
-**Workload note:** A's list is larger. If B finishes a milestone early, the agreed candidates to move to B are, in order: (1) the unmounted dashboard screen, (2) the live-session telemetry gauges. Moving a task = both agree, both progress files updated, DECISIONS.md line, and the path ownership change noted in §4.
+**Workload note:** B's list is the heavier one in v2.0 (all backend + RAG + estimator + Training Hub + Flutter data layer). If A finishes early, agreed candidates to help B, in order: (1) Flutter data-layer models/fixtures (B4), (2) Training Hub screens (B14). Moving a task = both agree, both progress files updated, DECISIONS.md line, and the path ownership change noted in §4.
 
 ---
 
@@ -181,20 +191,22 @@ At every milestone both stop, pull `main`, run the full stack together, and upda
 - Keep the existing section structure. Edit only sections tagged `[Owner: A]` / `[Owner: B]` matching you. `[Owner: both]` sections change only at M0 and M5.
 - Every step = a **copy-pasteable command** + **one plain-language line** saying what it does.
 - Update it **in the same commit** as any change to install/run/test commands, ports, env vars, seed data, or model-training steps.
-- At M5, B follows `SETUP.md` from a fresh clone in a clean folder; A fixes AI-section failures, B fixes the rest.
+- At M5, B follows `SETUP.md` from a fresh clone in a clean folder; A fixes app/edge failures, B fixes the rest.
 
 ---
 
 ## 11. Domain notes (so details are right)
 
-- **Seed data (B):** 4 machine types (`excavator`, `wheel_loader`, `drill_rig`, `dump_truck`), generic models (no brands), ~5 operators with different languages and experience, ~8 jobs across 2 projects, and **~60 past job logs** with varied weather/experience so A's estimator has something to learn from.
-- **Checklists (A):** structured after MSHA 30 CFR 56.14100 (pre-shift examination of mobile equipment, defects recorded and fixed before use), ISO 20474 (earth-moving machinery safety), and typical OEM daily walk-around checks. UI says **"based on"**, never "certified".
-- **Critical defect rule (B enforces):** an item with `critical: true` and status `defect` blocks session start.
-- **Fatigue / rest rules (B):** configurable defaults (max 12h per shift, min 10h rest between shifts, max 60h per 7 days) — placeholders inspired by aviation duty-time rules, not legal limits.
-- **Manuals (A):** short synthetic markdown manuals for the generic machines (don't copy real OEM manuals).
-- **Languages:** `en-IN`, `hi-IN`, `ta-IN`, `te-IN` minimum.
+- **Seed data (B):** 4 machine types (`excavator`, `wheel_loader`, `drill_rig`, `dump_truck`), generic models (no brands), ~5 operators with different languages and experience, ~8 jobs across 2 projects, and **~60 past job logs** (`JobLog`) with varied weather/experience so B's XGBoost estimator has something to learn from.
+- **Checklists (B, RAG/content):** structured after MSHA 30 CFR 56.14100 (pre-shift examination of mobile equipment), ISO 20474 (earth-moving machinery safety), and typical OEM daily walk-around checks. Stored as structured content, served via E12. UI says **"based on"**, never "certified".
+- **Critical defect rule (B enforces at E14):** an item with `critical: true` and status `defect` blocks session start.
+- **Fatigue / rest rules (B, at E10):** configurable defaults (max 12h per shift, min 10h rest between shifts, max 60h per 7 days) — placeholders inspired by aviation duty-time rules, not legal limits.
+- **Manuals (B):** short synthetic markdown manuals for the generic machines, embedded in the vector DB (don't copy real OEM manuals).
+- **Edge CV (A):** ML Kit gives eye-open probability + head Euler angles → derive `drowsiness` (eyes closed > ~2 s), `distraction` (head turned away), `operator_absent` (no face). Runs on the tablet's real front camera. No model training needed.
+- **Telemetry rules (A):** thresholds on the WS stream (seatbelt false, proximity_m low, idle_seconds high, hydraulic_temp_c high, load_pct high, unsafe speed+load combos). Each alert debounced (fires once per occurrence), POSTed to E18.
+- **Languages:** demo = `en-IN`, `hi-IN`, `ta-IN`. `te-IN` is stretch.
 - **Tablet UX (A):** glove-friendly (touch targets ≥ 56dp), dark high-contrast, landscape. Alerts = colour + icon + text + sound/vibration, never colour alone. B's Training Hub uses A's theme and shared widgets.
-- **Alert text** is localized in the app by alert `type` (A). Backend `message` is English, for logs.
+- **Alert text** is localized in the app by alert `type` (A). Backend/stored `message` is English, for logs.
 
 ---
 
@@ -202,18 +214,20 @@ At every milestone both stop, pull `main`, run the full stack together, and upda
 
 | Feature | Real in demo | Simulated / stretch |
 |---|---|---|
-| Machine data, cameras, proximity | — | Simulated; scenario triggers for demo |
-| Operator behaviour detection | Alerts + logging real | Detection simulated. Stretch (A): on-device face detection via tablet camera |
-| "Model training" | Estimator trained on seeded history | Seed history is synthetic, so accuracy numbers mean little — say so |
-| Noise cancellation | Push-to-talk + noise-robust speech-to-text | Hearing protection needs an ANC headset — present as hardware assumption |
-| Checklists from standards | Structure + logging real | Not a certified compliance tool |
+| **Operator CV alerts** | **Real** on-device ML Kit face detection on the tablet camera | Full driver-monitoring robustness is stretch |
+| Machine data, proximity, seatbelt sensor | — | Simulated by backend; `POST /sim/scenario` steers values so on-device rules fire |
+| Estimation (XGBoost) | Model trained on seeded history, real inference | Seed history is synthetic, so accuracy numbers mean little — say so |
+| Offline operation | — | Not shown; described as the real-product design (this is a proof of application) |
+| Noise cancellation | Push-to-talk + on-device STT | On-device DSP noise suppression is real-product only; ANC hearing protection is a hardware assumption |
+| Checklists / Q&A from standards & manuals | RAG structure + logging real | Not a certified compliance tool |
 | Manager portal | Assignments via Swagger `/docs` or seed | No manager UI |
+| Training Hub | Curated static content + quiz | "Heavy video synthesis" is real-product; revisit at project end |
 
 ---
 
 ## 13. Definition of done (per task)
 
-- Matches `CONTRACT.md` exactly (HTTP and internal interfaces).
+- Matches `CONTRACT.md` exactly (HTTP, WS, and internal Flutter interfaces).
 - Runs from `main` with the commands in `SETUP.md`.
-- Backend: at least one pytest per endpoint/function in your test folder. App: `flutter analyze` clean, works on mock and real API.
+- Backend: at least one pytest per endpoint/service in `tests/`. App: `flutter analyze` clean, works on mock and real API.
 - Progress file updated.

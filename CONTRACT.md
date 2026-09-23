@@ -1,7 +1,9 @@
-# ReBase — API + Internal Contract (v1.1)
+# ReBase — API + Internal Contract (v2.0)
 
-Single source of truth between **Person A (AI + UI)** and **Person B (Infra)**. Change only via the protocol in `CLAUDE.md` §6.
-B copies the JSON examples below into `app/assets/mock/` as mock fixtures. §6 defines the code-level interfaces (Python functions, Flutter providers) between the two halves.
+Single source of truth between **Person A (Edge AI + UI)** and **Person B (Infra + Backend AI)**. Change only via the protocol in `CLAUDE.md` §6.
+B copies the JSON examples below into `app/assets/mock/` as mock fixtures. §6 defines the code-level interfaces (Flutter providers) between the two halves.
+
+> **v2.0 re-architecture (read this):** Safety detection now runs **on the tablet (A)** — real computer-vision alerts from the front camera (ML Kit) plus threshold rules over streamed telemetry. The backend **simulates machine sensors** and streams them; it no longer decides alerts, it **stores** the alerts the app posts. Checklists, the manual Q&A assistant, and the briefing are served from the **backend RAG (B)**. Estimation is **XGBoost on the backend (B)**. STT is **on-device (A)**; Sarvam is TTS + translate only, proxied by the backend for the demo. No offline/local-cache in the demo.
 
 ---
 
@@ -15,6 +17,7 @@ B copies the JSON examples below into `app/assets/mock/` as mock fixtures. §6 d
 | IDs | Strings with prefixes: `op_`, `mc_`, `job_`, `prj_`, `asg_`, `ses_`, `chk_`, `alr_`, `trn_` |
 | Auth | None (hackathon). Operator picks their profile + 4-digit PIN (checked, not secure) |
 | Errors | `{"error": {"code": "SNAKE_UPPER_CODE", "message": "human readable"}}` with proper HTTP status |
+| Demo languages | `en-IN`, `hi-IN`, `ta-IN` (whole app switches). `te-IN` stays in the enum, stretch only. |
 
 ---
 
@@ -25,52 +28,63 @@ B copies the JSON examples below into `app/assets/mock/` as mock fixtures. §6 d
 | `MachineType` | `excavator`, `wheel_loader`, `drill_rig`, `dump_truck` |
 | `MachineStatus` | `available`, `in_use`, `maintenance` |
 | `Experience` | `novice`, `intermediate`, `expert` |
-| `Lang` | `en-IN`, `hi-IN`, `ta-IN`, `te-IN` |
+| `Lang` | `en-IN`, `hi-IN`, `ta-IN`, `te-IN` (demo uses the first three) |
 | `JobStatus` | `scheduled`, `in_progress`, `done` |
 | `Shift` | `day`, `night` |
 | `RestStatus` | `ok`, `warning`, `must_rest` |
 | `SessionState` | `pre_start`, `briefing`, `active`, `ended` |
 | `ChecklistStatus` | `pending`, `ok`, `defect`, `na` |
 | `AlertType` | `seatbelt_off`, `drowsiness`, `distraction`, `operator_absent`, `proximity`, `excessive_idle`, `overheat`, `overload`, `unsafe_operation` |
+| `AlertSource` | `edge_cv` (camera, on-device), `telemetry` (rule over streamed sensors) |
 | `Severity` | `info`, `warning`, `critical` |
-| `OperatorState` | `alert`, `drowsy`, `distracted`, `absent` |
-| `SimEvent` | any `AlertType` value, or `normal` |
+| `SimEvent` | any `AlertType` value, or `normal` (drives simulated **telemetry**; camera alerts come from the real device) |
+
+**Which alert comes from where (v2.0):**
+
+| Detected on the tablet by **ML Kit camera CV** (`edge_cv`) | Detected on the tablet by **rules over streamed telemetry** (`telemetry`) |
+|---|---|
+| `drowsiness`, `distraction`, `operator_absent` | `seatbelt_off`, `proximity`, `excessive_idle`, `overheat`, `overload`, `unsafe_operation` |
 
 ---
 
 ## 3. Endpoint list
 
-"Owner" = who writes the route. "Uses" = code from the other person that the route calls (see §6).
+"Owner" = who writes the route (all backend routes are **B** in v2.0). "Caller" notes when the tablet-side owner (A) is the one calling it.
 
-| # | Method | Path | Purpose | Owner | Uses | Milestone |
+| # | Method | Path | Purpose | Owner | Caller | Milestone |
 |---|---|---|---|---|---|---|
-| E1 | GET | `/health` | `{"status":"ok","version":"1.1"}` | B | — | M0 |
-| E2 | POST | `/auth/login` | `{operator_id, pin}` → `Operator` or 401 `BAD_PIN` | B | — | M1 |
-| E3 | GET | `/operators` | List `Operator` | B | — | M1 |
-| E4 | GET | `/operators/{id}` | One `Operator` (hours + rest) | B | — | M1 |
-| E5 | GET | `/operators/{id}/assignments?range=day\|week\|month` | List `Assignment` | B | — | M1 |
-| E6 | GET | `/machines`, `/machines/{id}` | `Machine` | B | — | M1 |
-| E7 | GET | `/jobs/{id}` | `Job` | B | — | M1 |
-| E8 | GET | `/jobs/{id}/estimate` | `Estimate` | **A** | B's DB models | M2 |
+| E1 | GET | `/health` | `{"status":"ok","version":"2.0"}` | B | — | M0 |
+| E2 | POST | `/auth/login` | `{operator_id, pin}` → `Operator` or 401 `BAD_PIN` | B | A app | M1 |
+| E3 | GET | `/operators` | List `Operator` | B | A app | M1 |
+| E4 | GET | `/operators/{id}` | One `Operator` (hours + rest) | B | A app | M1 |
+| E5 | GET | `/operators/{id}/assignments?range=day\|week\|month` | List `Assignment` | B | A app | M1 |
+| E6 | GET | `/machines`, `/machines/{id}` | `Machine` | B | A app | M1 |
+| E7 | GET | `/jobs/{id}` | `Job` | B | A app | M1 |
+| E8 | GET | `/jobs/{id}/estimate` | `Estimate` (XGBoost + fallback) | B | A app | M2 |
 | E9 | POST | `/assignments` | Manager creates assignment (Swagger only) | B | — | M2 |
-| E10 | POST | `/sessions` | `{operator_id, machine_id, job_id}` → `Session`; 409 `REST_REQUIRED` | B | — | M3 |
-| E11 | GET | `/sessions/{id}` | `Session` | B | — | M3 |
-| E12 | GET | `/sessions/{id}/checklist` | `Checklist` | B | A's `load_checklist()` | M3 |
-| E13 | PUT | `/sessions/{id}/checklist/items/{item_id}` | `{status, note?}` → `ChecklistItem` | B | — | M3 |
-| E14 | POST | `/sessions/{id}/checklist/complete` | → `Session` (`briefing`) or 422 `CHECKLIST_INCOMPLETE` / `CRITICAL_DEFECT` | B | — | M3 |
-| E15 | GET | `/sessions/{id}/briefing?lang=` | `Briefing` | **A** | B's DB models | M3 |
-| E16 | POST | `/sessions/{id}/start` | → `Session` (`active`) | B | — | M3 |
-| E17 | POST | `/sessions/{id}/end` | → `SessionSummary` | B | — | M3 |
-| E18 | GET | `/sessions/{id}/alerts` | List `Alert` | B | — | M3 |
-| E19 | POST | `/alerts/{id}/ack` | → `Alert` | B | — | M3 |
-| W1 | WS | `/ws/sessions/{id}` | Telemetry + alerts (§5) | B | — | M3 |
-| E20 | POST | `/assistant/ask` | `AssistantRequest` → `AssistantAnswer` | **A** | B's DB models | M4 |
-| E21 | POST | `/voice/stt` | multipart `file` (wav 16 kHz mono) + `lang` → `{"text","lang"}` | **A** | — | M4 |
-| E22 | POST | `/voice/tts` | `{text, lang}` → `audio/wav` bytes | **A** | — | M4 |
-| E23 | GET | `/operators/{id}/training/next?machine_type=` | `TrainingModule` | B | — | M4 |
-| E24 | POST | `/training/{module_id}/complete` | `{operator_id, score}` → `{"ok": true}` | B | — | M4 |
-| E25 | GET | `/sim/scenarios` | List of `SimEvent` | B | — | M3 |
-| E26 | POST | `/sim/scenario` | `{session_id, event}` → 202 | B | — | M3 |
+| E10 | POST | `/sessions` | `{operator_id, machine_id, job_id}` → `Session`; 409 `REST_REQUIRED` (fatigue gate) | B | A app | M3 |
+| E11 | GET | `/sessions/{id}` | `Session` | B | A app | M3 |
+| E12 | GET | `/sessions/{id}/checklist` | `Checklist` (from backend content/RAG store) | B | A app | M3 |
+| E13 | PUT | `/sessions/{id}/checklist/items/{item_id}` | `{status, note?}` → `ChecklistItem` | B | A app | M3 |
+| E14 | POST | `/sessions/{id}/checklist/complete` | → `Session` (`briefing`) or 422 `CHECKLIST_INCOMPLETE` / `CRITICAL_DEFECT` (defect gate) | B | A app | M3 |
+| E15 | GET | `/sessions/{id}/briefing?lang=` | `Briefing` (LLM + template fallback) | B | A app | M3 |
+| E16 | POST | `/sessions/{id}/start` | → `Session` (`active`) | B | A app | M3 |
+| E17 | POST | `/sessions/{id}/end` | → `SessionSummary` | B | A app | M3 |
+| W1 | WS | `/ws/sessions/{id}` | **Simulated telemetry stream** (§5). Server→client only. | B | A app | M3 |
+| E18 | POST | `/sessions/{id}/alerts` | App posts an **on-device-detected** alert → stored `Alert`. Body = `AlertCreate`. | B | **A app** | M3 |
+| E19 | GET | `/sessions/{id}/alerts` | List `Alert` (incident log) | B | A app | M3 |
+| E20 | POST | `/alerts/{id}/ack` | → `Alert` | B | A app | M3 |
+| E21 | GET | `/sim/scenarios` | List of `SimEvent` | B | — | M3 |
+| E22 | POST | `/sim/scenario` | `{session_id, event}` → 202 (nudges the telemetry stream) | B | — | M3 |
+| E23 | POST | `/assistant/ask` | `AssistantRequest` → `AssistantAnswer` (RAG + LLM) | B | A app | M4 |
+| E24 | POST | `/voice/tts` | `{text, lang}` → `audio/wav` bytes (Sarvam) | B | A app | M4 |
+| E25 | POST | `/translate` | `{text, target, source?}` → `{"text","lang"}` (Sarvam; optional) | B | A app | M4 |
+| E26 | GET | `/operators/{id}/training/next?machine_type=` | `TrainingModule` | B | B app | M4 |
+| E27 | POST | `/training/{module_id}/complete` | `{operator_id, score}` → `{"ok": true}` | B | B app | M4 |
+
+**Removed in v2.0:** old `/voice/stt` — speech-to-text now runs **on-device (A)** via the `speech_to_text` plugin.
+
+**On-device only (Person A, no HTTP):** ML Kit face-detection CV (`drowsiness`, `distraction`, `operator_absent`); telemetry rule engine (`seatbelt_off`, `proximity`, `excessive_idle`, `overheat`, `overload`, `unsafe_operation`); on-device STT; on-device TTS default (`flutter_tts`), with E24 as an optional cloud upgrade.
 
 ## 4. Schemas (JSON examples = mock fixtures)
 
@@ -126,7 +140,7 @@ B copies the JSON examples below into `app/assets/mock/` as mock fixtures. §6 d
 }
 ```
 
-### Estimate
+### Estimate  (XGBoost, backend)
 ```json
 {
   "job_id": "job_001",
@@ -184,7 +198,7 @@ Error on complete (422):
 {"error": {"code": "CRITICAL_DEFECT", "message": "Critical items have defects", "items": ["chk_02"]}}
 ```
 
-### Briefing
+### Briefing  (LLM, backend)
 ```json
 {
   "session_id": "ses_001",
@@ -197,20 +211,33 @@ Error on complete (422):
 }
 ```
 
-### Alert
+### Alert / AlertCreate
+`Alert` (stored, returned by E18/E19):
 ```json
 {
   "id": "alr_001",
   "session_id": "ses_001",
   "type": "drowsiness",
+  "source": "edge_cv",
   "severity": "critical",
   "message": "Operator eyes closed for more than 2 seconds",
   "ts": "2026-09-24T05:12:44Z",
   "acknowledged": false
 }
 ```
+`AlertCreate` (body the **app** posts to E18 — the tablet detected it on-device):
+```json
+{
+  "type": "drowsiness",
+  "source": "edge_cv",
+  "severity": "critical",
+  "message": "Operator eyes closed for more than 2 seconds",
+  "ts": "2026-09-24T05:12:44Z"
+}
+```
+> `message` is English (for logs). The app shows localized text looked up by alert `type` (A owns the strings).
 
-### AssistantRequest / AssistantAnswer
+### AssistantRequest / AssistantAnswer  (RAG + LLM, backend)
 ```json
 {"machine_id": "mc_001", "session_id": "ses_001", "question": "How do I switch to power mode?", "lang": "hi-IN"}
 ```
@@ -243,9 +270,9 @@ Error on complete (422):
 
 ---
 
-## 5. WebSocket `/ws/sessions/{id}`
+## 5. WebSocket `/ws/sessions/{id}`  (telemetry stream only in v2.0)
 
-Server → client, every 1 second while session is `active`:
+Server → client, every 1 second while session is `active`. The simulator produces **machine sensors**; **operator state is no longer here** — it is decided on-device by the camera CV.
 ```json
 {
   "type": "telemetry",
@@ -258,81 +285,44 @@ Server → client, every 1 second while session is `active`:
     "speed_kmh": 0.0,
     "idle_seconds": 0,
     "seatbelt": true,
-    "proximity_m": 14.2,
-    "operator_state": "alert"
+    "proximity_m": 14.2
   }
 }
 ```
-Server → client, when a safety rule fires:
-```json
-{"type": "alert", "alert": { "...": "Alert object" }}
-```
-Client → server:
-```json
-{"type": "ack", "alert_id": "alr_001"}
-```
-If the session is not `active`, the server sends `{"type": "error", "code": "SESSION_NOT_ACTIVE"}` and closes.
+- The app's **telemetry rule engine (A)** watches this stream and raises `telemetry`-source alerts (seatbelt/proximity/idle/overheat/overload/unsafe), then POSTs each to **E18**.
+- The app's **camera CV (A)** independently raises `edge_cv`-source alerts (drowsiness/distraction/absence) and POSTs them to **E18**.
+- **Ack:** the app calls **E20** (`POST /alerts/{id}/ack`).
+- If the session is not `active`, the server sends `{"type": "error", "code": "SESSION_NOT_ACTIVE"}` and closes.
+
+> The server does **not** push `{"type":"alert"}` anymore — alert creation moved to the tablet. `POST /sim/scenario` (E22) simply steers the telemetry values (e.g. drops `seatbelt` to `false`, or `proximity_m` low) so the on-device rules fire during the demo. Camera alerts are triggered by a real face in front of the tablet.
 
 ---
 
 ## 6. Internal interfaces (code level)
 
-These are the only places where one person's code imports the other's. Signatures here are frozen like HTTP endpoints. **Each owner commits a working stub at M0** (returning the §4 example data) so nobody is blocked.
+In v2.0 the two halves meet **only inside the Flutter app** (plus the HTTP/WS contract above). The backend is entirely B — Person A writes **no backend code** and imports none. Each owner commits a working stub at M0.
 
-### 6.1 Backend — B provides, A imports (never edits)
-
-```python
-# backend/app/db.py
-def get_db() -> Iterator[Session]            # FastAPI dependency (SQLModel session)
-
-# backend/app/models.py  — SQLModel tables, field names = §4 schemas
-Operator, Machine, Job, Project, Assignment, WorkSession, ChecklistRecord, Alert, TrainingRecord
-
-class JobLog(SQLModel, table=True):          # history for A's estimator
-    id: str
-    job_id: str
-    operator_id: str
-    machine_type: str                        # MachineType
-    planned_hours: float
-    actual_hours: float
-    weather: str                             # "clear" | "rain" | "heat" | "dust"
-    operator_experience: str                 # Experience
-    date: date
-```
-B's `main.py` mounts A's router once at M0: `app.include_router(ai_router)` from `app.ai.router`.
-
-### 6.2 Backend — A provides, B imports (never edits)
-
-```python
-# backend/app/ai/router.py
-router: APIRouter                             # contains E8, E15, E20, E21, E22
-
-# backend/app/ai/api.py
-def load_checklist(machine_type: str) -> dict
-    # returns {"standard_refs": [...], "sections": [{"title", "items": [{"id","text","critical"}]}]}
-    # B adds "status"/"note" per session and stores them
-```
-
-### 6.3 Flutter — B provides, A uses (never edits)
+### 6.1 Flutter — B provides, A uses (never edits)
 
 ```dart
 // lib/core/api/api_client.dart
-abstract class ApiClient { /* one method per endpoint E1–E26, returning §4 models */
-  Future<String> stt(Uint8List wav, String lang);   // E21
-  Future<Uint8List> tts(String text, String lang);  // E22
+abstract class ApiClient { /* one method per endpoint E1–E27, returning §4 models */
+  Future<Alert>   postAlert(String sessionId, AlertCreate alert);   // E18 — A logs on-device alerts
+  Future<Alert>   ackAlert(String alertId);                         // E20
+  Future<Uint8List> tts(String text, String lang);                 // E24 (optional cloud TTS)
+  Future<String>    translate(String text, String target);         // E25 (optional)
 }
 final apiClientProvider = Provider<ApiClient>(...);           // mock or http by USE_MOCK
 
 // lib/core/api/ws_client.dart
-final sessionStreamProvider = StreamProvider.family<SessionEvent, String>(...); // telemetry | alert
-void ackAlert(String sessionId, String alertId);
+final telemetryStreamProvider = StreamProvider.family<Telemetry, String>(...); // §5 telemetry only
 
-// lib/core/models/*.dart   — one class per §4 schema, fromJson/toJson
+// lib/core/models/*.dart   — one class per §4 schema, fromJson/toJson (incl. AlertCreate, Telemetry)
 // lib/features/training/training_hub_screen.dart
 class TrainingHubScreen extends StatelessWidget { const TrainingHubScreen({required this.operatorId, required this.machineType}); }
 ```
 
-### 6.4 Flutter — A provides, B uses (never edits)
+### 6.2 Flutter — A provides, B uses (never edits)
 
 ```dart
 // lib/ui/router.dart
@@ -343,9 +333,13 @@ class AppTheme { static ThemeData dark(); }
 ```
 Training Hub UI text lives in B's `features/training/training_strings.dart` (a per-language map), so B never edits A's ARB files.
 
+### 6.3 Backend
+No cross-person imports — `backend/` is entirely B. A's on-device edge code (CV, telemetry rules) lives in `app/lib/edge/` and depends only on B's `core/` models + the WS/HTTP contract.
+
 ## 7. Change log
 
 | Version | Date | By | Change |
 |---|---|---|---|
 | v1.0 | M0 | A + B | Initial contract |
 | v1.1 | M0 | A + B | Re-split: A = AI + UI, B = Infra. Added Owner column, §6 internal interfaces, `JobLog` model |
+| v2.0 | M0 | A + B | Edge re-architecture. Safety detection → tablet (A): ML Kit camera CV + telemetry rules; app POSTs alerts (new E18). WS = telemetry only. Checklists + Q&A + briefing → backend RAG (B). Estimator → XGBoost (B). STT → on-device (A); removed `/voice/stt`. Sarvam = TTS + translate proxy (B). Backend now entirely B; §6 meets only in Flutter. Demo langs en/hi/ta; no local cache. Endpoints renumbered E1–E27. |
