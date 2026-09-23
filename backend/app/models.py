@@ -1,7 +1,8 @@
 """Database tables (SQLModel). API shapes live in app/schemas.py (CONTRACT §4).
 
 Enum-valued columns are stored as plain strings; the allowed values are the
-CONTRACT §2 enums defined in app/schemas.py.
+CONTRACT §2 enums defined in app/schemas.py. Datetimes are timezone-aware UTC
+(SQLModel rejects naive ones on write and returns UTC on read).
 """
 
 from datetime import date, datetime

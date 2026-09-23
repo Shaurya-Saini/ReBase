@@ -43,6 +43,17 @@ python -m app.seed                       # wipes and refills backend/rebase.db w
 python -m app.ai.train_estimator         # trains the XGBoost time estimator → data/models/estimator.json
 # The RAG vector store builds itself on first server start (ingests data/manuals/ into data/models/chroma/).
 ```
+Re-seed right before a demo: all dates and work hours are relative to when the seed runs.
+
+Demo logins (PINs are checked but not secure):
+
+| Operator | PIN | Lang | Rest status (demo story) |
+|---|---|---|---|
+| `op_001` Ravi Kumar | 1234 | ta-IN | ok — hero, excavator job `job_001` today |
+| `op_002` Priya Sharma | 2345 | hi-IN | warning — 52 h this week |
+| `op_003` Arjun Murugan | 3456 | ta-IN | ok — novice (Training Hub) |
+| `op_004` Mohit Verma | 4567 | hi-IN | must_rest — starting a session is blocked (409 `REST_REQUIRED`) |
+| `op_005` Sam D'Souza | 5678 | en-IN | ok |
 
 ### 3.3 Run
 ```bash
