@@ -5,17 +5,6 @@ Delete entries as they stop being used.
 """
 
 
-ALERT = {
-    "id": "alr_001",
-    "session_id": "ses_001",
-    "type": "drowsiness",
-    "source": "edge_cv",
-    "severity": "critical",
-    "message": "Operator eyes closed for more than 2 seconds",
-    "ts": "2026-09-24T05:12:44Z",
-    "acknowledged": False,
-}
-
 ASSISTANT_ANSWER = {
     "answer": "…(answer in hi-IN)…",
     "lang": "hi-IN",

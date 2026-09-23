@@ -4,7 +4,7 @@
 > Status: ⬜ todo · 🟨 doing · ✅ done (matches CONTRACT, tested) · 🟦 done on mock/stub only · ⛔ blocked · ➡️ moved
 > B owns **all backend** (incl. Training Hub content + endpoints). Since v2.1 **all Flutter work moved to A** (DECISIONS #14) — B has no Flutter toolchain.
 
-**Last updated:** 2026-09-23 (ownership re-split v2.1)  **Current milestone:** M0  **Contract version in use:** v2.1
+**Last updated:** 2026-09-23 (ownership re-split v2.1)  **Current milestone:** M3 (backend side done)  **Contract version in use:** v2.1
 
 ## Tasks
 
@@ -19,7 +19,7 @@
 | B6 | **XGBoost estimator**: train on `JobLog`, fallback formula, E8 + `train_estimator` script | E8 | M2 | ✅ | Needs B1 seed |
 | B7 | Sessions + checklist status + critical-defect gate + briefing (LLM + template fallback) | E10–E17 | M3 | ✅ | Uses B10 checklist content |
 | B8 | Simulator engine + scenarios + WebSocket **telemetry stream** (no server-side alerts) | W1, E21, E22 | M3 | ✅ | `POST /sim/scenario` steers values so A's rules fire |
-| B9 | Alert storage + list + ack (receives A's on-device alerts) | E18, E19, E20 | M3 | ⬜ | Incident log |
+| B9 | Alert storage + list + ack (receives A's on-device alerts) | E18, E19, E20 | M3 | ✅ | Incident log |
 | B10 | **RAG**: ChromaDB vector store + `sentence-transformers`; ingest manuals + checklist content; serve checklist (E12) | E12 | M3 | 🟨 | Checklists structured; RAG for Q&A |
 | B11 | **Q&A assistant** (E23) via RAG + LLM, answers in `lang`, returns sources | E23 | M4 | ⬜ | |
 | B12 | Sarvam proxy: TTS (E24) + translate (E25); 503 on missing key/timeout, never crash | E24, E25 | M4 | ⬜ | Check docs.sarvam.ai for current models |
@@ -30,7 +30,7 @@
 ## Ready for A
 - **B0 backend skeleton:** every endpoint E1–E27 + W1 exists and returns the CONTRACT §4 example JSON (stubs). Run it (SETUP §3) and point the app's real client at it; browse/try everything at `http://localhost:8000/docs`. W1 streams the §5 example telemetry every second for any session id. Errors follow §1 (`{"error": {"code", "message"}}`); bad enum values → 422 `VALIDATION_ERROR`. E24 `/voice/tts` returns 503 `UPSTREAM_UNAVAILABLE` until B12 — use on-device `flutter_tts`.
 - **B1 seed data** (`python -m app.seed`): IDs `op_001`–`op_005`, `mc_001`–`mc_004` (one per machine type), `prj_001`/`prj_002`, `job_001`–`job_008`, `asg_001`–`asg_008`. Contract example IDs (`op_001` Ravi / `mc_001` / `job_001` / `prj_001`) are real seeded rows, so your mock fixtures line up. Demo logins + PINs + rest-status story are in SETUP §3.2 (`op_001` / 1234 = Ravi, ta-IN). Served live since B2 (below).
-- **B2 live on seeded data: E2–E7, E9.** Stubs remain for alerts (B9), assistant (B11), voice (B12), training (B13). Notes for your `HttpApiClient`:
+- **B2 live on seeded data: E2–E7, E9.** Stubs remain for assistant (B11), voice (B12), training (B13). Notes for your `HttpApiClient`:
   - **B3 live:** `hours_today` = hours in the *current shift* (work with breaks < 10 h counts as one shift; resets to 0 after 10 h rest, so night shifts crossing midnight count correctly). `hours_7d` = rolling 7 days. `rest.status`: `must_rest` at 12 h shift or 60 h/7 d (with `next_allowed_start` + `reason`), `warning` at ≥ 9.6 h shift or ≥ 51 h/7 d (with `reason`), else `ok` (nulls).
   - **E10 gate:** `POST /sessions` for a `must_rest` operator → `409 REST_REQUIRED`, body `{"error": {"code", "message" (= reason), "next_allowed_start": "…Z"}}`. Demo: `op_004` Mohit is always blocked; `op_002` Priya shows `warning` but may start. Rest of E10 (persisting the session) is still a stub until B7.
   - E5 `range`: `day` = today (IST), `week` = today + next 6 days, `month` = today + next 29 days; sorted by date then shift.
@@ -50,6 +50,8 @@
   - `POST /sim/scenario {session_id, event}` → 202 (`409 SESSION_NOT_ACTIVE`, `404 SESSION_NOT_FOUND`, `422 UNKNOWN_EVENT`). Each nudge lasts ~15 s then returns to normal; a new nudge replaces the running one. Targets sit just past your `TelemetryThresholds`: `seatbelt_off` → false; `proximity` ramps 9→1.5 m (warning then critical); `overheat` 88→108 °C (warning then critical); `overload` 85→104 %; `unsafe_operation` 18 km/h @ 85 %; `excessive_idle` → idle_seconds 170→185 (fires ~10 s in). Camera events (`drowsiness` …) are accepted as no-ops with a note.
   - E17 summary `idle_minutes` is now real (simulated idle time).
 - **LLM default is now Gemini (free tier)** — briefing text becomes fully Tamil/Hindi once B's key is in `.env`; template fallback otherwise. Speech stays on your side (on-device STT/TTS).
+- **B9 live: E18–E20 incident log.** `POST /sessions/{id}/alerts` with your `AlertCreate` (your Dart `toIso8601String()` timestamps are fine; `ts` optional) → 201 stored `Alert` with a global `alr_NNN` id. Accepted while the session is `active` (and `ended`, so an alert in flight at end isn't lost); `pre_start`/`briefing` → `409 SESSION_NOT_ACTIVE`. A retried post (same type + severity + ts) returns the existing alert with 200 — safe to retry. An escalation (warning → critical) is a new alert. `GET …/alerts` = newest first. `POST /alerts/{id}/ack` is idempotent; unknown → `404 ALERT_NOT_FOUND`. E17 summary `alerts_total` / `alerts_critical` now count these.
+- **M3 backend is complete:** start session → checklist → briefing → live telemetry → scenario → your on-device alert → E18 → ack → end with summary, all real.
 
 ## Blockers
 _None_
@@ -70,3 +72,4 @@ _None_
 | 2026-09-24 | B6 ✅: `ai/estimator.py` (XGBoost predicts actual/planned ratio from machine/weather/experience; counterfactual factors; p10–p90 CV residual band; formula fallback; mtime-cached loader) + `ai/train_estimator.py` (5-fold CV: MAE 0.38 h vs 1.40 h planned-hours baseline on synthetic seed). E8 real incl. project completion date. Server auto-trains if model missing. `ESTIMATOR_PATH` setting. `tests/test_estimator.py`; 99/99 pass; fresh-clone check OK. | B7 sessions + checklist + briefing (M3), B10 checklist content alongside. |
 | 2026-09-24 | B7 ✅ + B10 checklist content: `services/sessions.py` state machine (create checks, abandon unstarted, checklist merge/upsert, CRITICAL_DEFECT / CHECKLIST_INCOMPLETE gate, start/end + machine/job status), `data/checklists/*.yaml` ×4 (MSHA 56.14100 / ISO 20474-based), `ai/checklists.py`, `ai/briefing.py` (facts → LLM JSON in `lang`, en/hi/ta template fallback, cached), `ai/llm.py` (Anthropic SDK, structured output, refusal/fallbacks; any failure → `LLMUnavailable`), `services/estimates.py`. Live run caught a 500 when no API key (SDK raises TypeError) → fixed + regression test. `tests/test_sessions.py`; 123/123 pass. | B8 simulator + WS, B9 alerts storage (M3). B10 rest = manuals + Chroma (with B11). Ask user which LLM key they have. |
 | 2026-09-24 | B8 ✅: `simulator/engine.py` (MachineSim per machine type, 1 tick = 1 simulated s, idle tracking; SimulatorEngine async loop + subscriber queues, restore active sessions on startup), `simulator/scenarios.py` (overlays tuned to A's thresholds, ramps for warning→critical), real W1 + E22; E16/E17 start/stop the sim, summary idle_minutes real. Gemini provider added to `llm.py` (google-genai `generate_content`, JSON schema output, 15 s timeout; verified API + model names against current Google docs; default `gemini-3.8-flash`, free tier). `tests/test_simulator.py` + `tests/test_llm.py`; 149/149 pass; live 1 Hz WS check OK. | B9 alert storage (E18–E20), then B10/B11 RAG + assistant on Gemini. |
+| 2026-09-24 | B9 ✅: real E18 (state rule active/ended, naive ts → UTC, idempotent retry on type+severity+ts), E19 newest-first, E20 idempotent ack; summary counts real alerts. Removed alert stub. `tests/test_alerts.py`; 158/158 pass. M3 backend complete. | B10 manuals + Chroma, B11 assistant on Gemini (M4). |
