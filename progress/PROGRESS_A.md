@@ -4,13 +4,13 @@
 > Status: ⬜ todo · 🟨 doing · ✅ done (matches CONTRACT, tested, works on real API) · 🟦 done on mock/stub only · ⛔ blocked · ➡️ moved
 > Person A writes **no backend code** in v2.0. All screens + on-device intelligence.
 
-**Last updated:** 2026-09-23 (A0 authored; A8 rule engine done + verified)  **Current milestone:** M0  **Contract version in use:** v2.0
+**Last updated:** 2026-09-23 (v2.1 accepted; app scaffolded, analyze clean, tests green)  **Current milestone:** M0→M1  **Contract version in use:** v2.1
 
 ## Tasks
 
 | ID | Task | Endpoints / uses | Milestone | Status | Notes |
 |---|---|---|---|---|---|
-| A0 | Stubs: `ui/theme.dart` (`AppTheme.dark()`), `ui/router.dart` (`buildRouter()` → every route to a placeholder; `/training` → B's `TrainingHubScreen`), empty shared widgets, `edge/` package skeleton | — | M0 | 🟦 | Files authored; `flutter analyze` pending B0 (project/pubspec/`TrainingHubScreen` stub). See Requests for B |
+| A0 | Stubs: `ui/theme.dart` (`AppTheme.dark()`), `ui/router.dart` (`buildRouter()` → every route to a placeholder; `/training` → `TrainingHubScreen`), shared widgets, `edge/` package skeleton | — | M0 | ✅ | Compiles; `flutter analyze` clean; app runs on scaffold |
 | A1 | Theme + shared widgets (BigButton, StatusCard, AlertBanner) | — | M1 | ⬜ | B's Training Hub reuses these |
 | A2 | Login (operator picker, PIN, language picker) + mounted/unmounted mode switch | E2, E3 | M1 | ⬜ | |
 | A3 | Unmounted dashboard: today / week / month + hours & rest card | E4, E5 | M1 | ⬜ | |
@@ -25,19 +25,21 @@
 | A12 | l10n: en, hi, ta ARB files incl. alert texts by `type`; full-app language switching | — | M4 | 🟦 | ARB files done (38 keys × en/hi/ta, JSON + key-parity verified) + `l10n.yaml`. Alert texts keyed by type. Remaining: `flutter gen-l10n` (needs B pubspec `generate: true`) + language-switch provider + wire strings into screens. hi/ta need a native-speaker review pass |
 | A13 | Tests (`test/features/*`, `test/edge/`) + SETUP "App" / "Edge" sections | — | M5 | ⬜ | |
 | A14 | Stretch: noise-robust capture polish, `te-IN`, on-device DSP | — | Stretch | ⬜ | Only after M4 |
+| A15 | Scaffold Flutter project (`flutter create`), `pubspec.yaml`, `main.dart`, l10n codegen, `core/locale.dart` | — | M0 | ✅ | Done. `flutter pub get` (44 deps), `gen-l10n` (en/hi/ta), `analyze` clean, `flutter test` 10/10. Edge/voice deps deferred to A9/A10 |
+| A16 | Data layer: `core/models/*` (per §4) + barrel, `ApiClient`, `MockApiClient` + `assets/mock` fixtures, `telemetryStreamProvider`, providers | §6.1 | M1 | ⬜ | Adopted from B4 |
+| A17 | `HttpApiClient` (all endpoints incl. binary TTS, alert POST) | §6.1 | M2 | ⬜ | Adopted from B5 |
+| A18 | Training Hub screens (steps, video, quiz, complete, 3 langs) — consumes E26/E27 | E26, E27 | M4 | ⬜ | Adopted from B14; content from B13 |
 
 ## Ready for B
 - **A0 authored** (not yet pushed): `lib/ui/theme.dart` (`AppTheme.dark()`, `severityColor`), `lib/ui/router.dart` (`buildRouter()`), shared widgets `BigButton`/`StatusCard`/`AlertBanner` (ready for your Training Hub), placeholder screens for all A features, `lib/edge/` skeleton.
 - Package name assumed **`app`** (from `flutter create app --org com.rebase`). Imports use `package:app/...`. Tell me if you use a different `name:`.
 
 ## Blockers
-- **B0 needed to compile A0:** no Flutter project yet (`flutter create`, `pubspec.yaml`, `lib/main.dart`, `lib/core/` stubs, and the `TrainingHubScreen` stub at `lib/features/training/training_hub_screen.dart`). My files reference `package:app/features/training/training_hub_screen.dart` per CONTRACT §6.1.
+_None._ v2.1 (DECISIONS #14): I own the whole `app/` and have Flutter installed — self-unblocked. Scaffolding the project myself (A15).
 
 ## Requests for partner (B)
-1. **pubspec:** add the `# >>> A deps … # <<< A deps` block in `dependencies:` so I can add my deps. A-block deps I need (I'll fill them, just need the markers): `flutter_riverpod`, `go_router`, `google_mlkit_face_detection`, `camera`, `speech_to_text`, `flutter_tts`, `intl`, and `flutter_localizations` (sdk). Also set `flutter: generate: true` for l10n (A12).
-2. **Models barrel:** please export a `lib/core/models/models.dart` barrel so `edge/` and screens import one path (§6.1). My edge stubs use a local `AlertDraft` for now and will swap to core `AlertCreate` in A8.
-3. **`.gitignore`:** it ignores `*.joblib` but v2.0 uses XGBoost `estimator.json` + a Chroma store — add `backend/data/models/estimator.json` and `backend/data/models/chroma/` (your file, flagging only).
-4. Confirm `TrainingHubScreen` constructor matches CONTRACT §6.1: `TrainingHubScreen({required String operatorId, required String machineType})` — my router builds it that way.
+- **OK given on the v2.1 re-split** (DECISIONS #14 / CONTRACT v2.1). I now own the entire Flutter app. My old requests 1, 2, 4 are **closed** — they became my own tasks (pubspec/deps, `core/models` barrel, `TrainingHubScreen`).
+- (Open) #3: add `backend/data/models/estimator.json` + `backend/data/models/chroma/` to `.gitignore` — B said they'll handle it with B0.
 
 ## Session log
 | When | Did | Next |
