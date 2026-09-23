@@ -1,4 +1,4 @@
-"""B0: every CONTRACT endpoint exists and returns the §4 shape.
+"""B0: endpoints still on stubs return the §4 shape. (E2–E7, E9 → test_core.py)
 
 As each task replaces a stub with the real thing, move its checks into that
 router's own test file with real seeded data.
@@ -18,31 +18,7 @@ def test_tables_created(client):
             "trainingcompletion"} <= tables
 
 
-def test_e2_e3_e4_operators(client):
-    op = client.post("/auth/login", json={"operator_id": "op_001", "pin": "1234"}).json()
-    assert op["id"] == "op_001" and op["rest"]["status"] == "ok"
-    assert client.get("/operators").json()[0]["lang"] == "ta-IN"
-    assert client.get("/operators/op_002").json()["id"] == "op_002"
-
-
-def test_e5_e9_assignments(client):
-    r = client.get("/operators/op_001/assignments", params={"range": "week"})
-    assert r.status_code == 200
-    asg = r.json()[0]
-    assert asg["job"]["id"] == "job_001" and asg["machine"]["id"] == "mc_001"
-    assert client.get("/operators/op_001/assignments", params={"range": "year"}).status_code == 422
-    r = client.post("/assignments", json={"operator_id": "op_001", "job_id": "job_001",
-                                          "machine_id": "mc_001", "date": "2026-09-25"})
-    assert r.status_code == 201 and r.json()["date"] == "2026-09-25"
-
-
-def test_e6_machines(client):
-    assert client.get("/machines").json()[0]["type"] == "excavator"
-    assert client.get("/machines/mc_009").json()["id"] == "mc_009"
-
-
-def test_e7_e8_jobs(client):
-    assert client.get("/jobs/job_001").json()["planned_hours"] == 6.0
+def test_e8_estimate(client):
     est = client.get("/jobs/job_001/estimate").json()
     assert est["range_hours"] == [5.9, 7.6] and len(est["factors"]) == 2
 

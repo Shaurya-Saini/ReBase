@@ -10,10 +10,13 @@ os.environ["SIM_TICK_SECONDS"] = "0.01"
 
 from fastapi.testclient import TestClient  # noqa: E402
 
+from app.db import engine  # noqa: E402
 from app.main import app  # noqa: E402
+from app.seed import seed  # noqa: E402
 
 
 @pytest.fixture
 def client():
-    with TestClient(app) as c:  # runs lifespan (creates tables)
+    seed(engine)  # fresh demo data per test, relative to the real clock
+    with TestClient(app) as c:  # runs lifespan
         yield c

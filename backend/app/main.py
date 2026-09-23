@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.ai import router_assistant, router_voice
 from app.config import settings
-from app.db import create_db
+from app.db import create_db, engine
 from app.errors import install_error_handlers
 from app.routers import (
     alerts,
@@ -27,8 +27,21 @@ from app.schemas import Health
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     create_db()
+    _seed_if_empty()
     # TODO B8: start simulator · TODO B10: warm RAG store
     yield
+
+
+def _seed_if_empty() -> None:
+    """Fresh clone convenience: an empty DB gets the demo data automatically."""
+    from sqlmodel import Session, select
+
+    from app.models import Operator
+    from app.seed import seed
+
+    with Session(engine) as db:
+        if db.exec(select(Operator)).first() is None:
+            seed(engine)
 
 
 app = FastAPI(title="ReBase API", version=settings.VERSION, lifespan=lifespan)
