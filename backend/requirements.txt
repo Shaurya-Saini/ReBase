@@ -1,0 +1,16 @@
+# Core API
+fastapi>=0.115
+uvicorn[standard]>=0.30
+sqlmodel>=0.0.22
+python-multipart>=0.0.9
+pyyaml>=6.0
+httpx>=0.27
+
+# Backend AI (B6 estimator, B10/B11 RAG)
+xgboost>=2.1
+scikit-learn>=1.5
+chromadb>=0.5
+sentence-transformers>=3.0
+
+# Tests
+pytest>=8.0

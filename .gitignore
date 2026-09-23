@@ -12,3 +12,5 @@ app/build/
 app/.flutter-plugins*
 app/.packages
 backend/data/models/*.joblib
+backend/data/models/estimator.json
+backend/data/models/chroma/

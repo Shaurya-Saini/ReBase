@@ -33,8 +33,8 @@ echo "I am Person A (Edge AI + UI)" > CLAUDE.local.md   # or "I am Person B (Inf
 ### 3.1 Install
 ```bash
 cd backend
-python -m venv .venv && source .venv/bin/activate    # isolated Python env (Windows: .venv\Scripts\activate)
-pip install -r requirements.txt                      # fastapi, xgboost, chromadb, sentence-transformers, ...
+python3.11 -m venv .venv && source .venv/bin/activate   # isolated Python 3.11 env (Windows: .venv\Scripts\activate). With uv: uv venv --python 3.11 .venv
+pip install -r requirements.txt                      # fastapi, xgboost, chromadb, sentence-transformers, ... (first install downloads torch, a few minutes)
 ```
 
 ### 3.2 Seed the database + build models
@@ -59,6 +59,7 @@ pytest -q                   # runs all backend tests
 | Error | Fix |
 |---|---|
 | `chromadb` / embedding model slow on first run | It downloads the embedding model once; let it finish, then it's cached |
+| `TypeError: unsupported operand type(s) for \|` or syntax errors on start | Wrong Python — macOS `python3` is 3.9. Recreate the venv with `python3.11` |
 | _(fill in as you hit them)_ | |
 
 ---

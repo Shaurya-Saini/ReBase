@@ -15,8 +15,11 @@ backend/
 │   ├── db.py                  engine (SQLite backend/rebase.db) + get_db()
 │   ├── models.py              all tables incl. JobLog + Alert
 │   ├── seed.py                `python -m app.seed` → wipe + refill DB (incl. ~60 JobLog rows)
-│   ├── routers/               operators, machines, jobs, assignments, sessions, checklist,
-│   │                          alerts, training, sim, ws, assistant, voice
+│   ├── schemas.py             API request/response shapes = CONTRACT §2 enums + §4 schemas
+│   ├── errors.py              ApiError + handlers → {"error": {"code", "message"}} (§1)
+│   ├── stub_data.py           B0 stubs (§4 examples verbatim); delete entries as routes go real
+│   ├── routers/               operators (incl. /auth/login), machines, jobs, assignments, sessions,
+│   │                          checklist, alerts, training, sim, ws   (assistant + voice live in ai/)
 │   ├── services/
 │   │   ├── fatigue.py         hours_today, hours_7d, rest status (E4, E10 gate)
 │   │   └── sessions.py        session state machine + checklist status + critical-defect gate (E14)
@@ -41,3 +44,4 @@ backend/
 - Simulator must be demo-friendly: normal values with small noise; a scenario nudge lasts ~10 s then returns to `normal`.
 - M0 duty: commit `db.py`, `models.py` (tables can be minimal but `JobLog`/`Alert` fields must match §4), all routers stubbed returning §4 example data. (Since v2.1 the Flutter `core/` stubs are A's — B writes no Flutter code.)
 - Run `pytest -q` before every merge to `main`.
+- Python 3.11 venv: `uv venv --python 3.11 .venv` (or `python3.11 -m venv .venv`) — the macOS system `python3` is 3.9 and too old.

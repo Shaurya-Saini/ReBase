@@ -10,7 +10,7 @@
 
 | ID | Task | Endpoints / provides | Milestone | Status | Notes |
 |---|---|---|---|---|---|
-| B0 | Scaffold: FastAPI skeleton + `/health`, `db.py` (`get_db`), `models.py` (incl. `JobLog`), config, all routers stubbed returning §4 examples | E1 | M0 | ⬜ | Do first. Flutter half (`flutter create`, pubspec, `main.dart`, `core/config.dart`) ➡️ moved to A |
+| B0 | Scaffold: FastAPI skeleton + `/health`, `db.py` (`get_db`), `models.py` (incl. `JobLog`), config, all routers stubbed returning §4 examples | E1 | M0 | ✅ | Do first. Flutter half (`flutter create`, pubspec, `main.dart`, `core/config.dart`) ➡️ moved to A |
 | B1 | Seed: 4 machines, ~5 operators, 2 projects, ~8 jobs, ~60 `JobLog` rows (varied weather/experience/actual-vs-planned) | — | M1 | ⬜ | B6 depends on this |
 | B2 | Core endpoints: login, operators, machines, jobs, assignments | E2–E7, E9 | M1 | ⬜ | |
 | B3 | Fatigue / rest service (feeds E4, gate at E10) | in E4, E10 | M1 | ⬜ | |
@@ -28,7 +28,7 @@
 | B15 | Backend tests (`tests/`) + SETUP Backend/AI sections + lead fresh-clone check | — | M5 | ⬜ | Flutter tests + SETUP App section → A |
 
 ## Ready for A
-_(e.g. "B0 models + get_db pushed @ abc123", "E2–E7 live on main", "fake telemetry stream in MockApiClient")_
+- **B0 backend skeleton:** every endpoint E1–E27 + W1 exists and returns the CONTRACT §4 example JSON (stubs). Run it (SETUP §3) and point the app's real client at it; browse/try everything at `http://localhost:8000/docs`. W1 streams the §5 example telemetry every second for any session id. Errors follow §1 (`{"error": {"code", "message"}}`); bad enum values → 422 `VALIDATION_ERROR`. E24 `/voice/tts` returns 503 `UPSTREAM_UNAVAILABLE` until B12 — use on-device `flutter_tts`.
 
 ## Blockers
 _None_
@@ -36,9 +36,10 @@ _None_
 ## Requests for partner (A)
 1. **Please OK the v2.1 ownership re-split** (DECISIONS #14, CONTRACT v2.1): you now own the whole `app/` — `flutter create app --org com.rebase --platforms android`, `pubspec.yaml`, `main.dart`, `lib/core/` (models + barrel, `ApiClient`/`MockApiClient`/`HttpApiClient`, `telemetryStreamProvider`), `assets/mock/`, and Training Hub screens. No API changes.
 2. Please add B0 (Flutter half), B4, B5, B14 to `PROGRESS_A.md` (I can't edit your file), and close your old requests 1, 2, 4 to me — they're yours now.
-3. Your request 3 (`.gitignore` for `estimator.json` + `chroma/`) — I'll handle it with B0.
+3. ~~Your request 3 (`.gitignore` for `estimator.json` + `chroma/`)~~ — done in B0.
 
 ## Session log
 | When | Did | Next |
 |---|---|---|
 | 2026-09-23 | Created `CLAUDE.local.md` (Person B). Re-split ownership v2.1: whole Flutter app → A (CLAUDE.md §2–4/§9, CONTRACT v2.1, app/CLAUDE.md, backend/CLAUDE.md, SETUP §4, DECISIONS #14). | Get A's OK, then B0 (backend scaffold). |
+| 2026-09-23 | B0 ✅: FastAPI app (`main.py`, `config.py`, `db.py`, `models.py` incl. `JobLog`/`Alert`/`ChecklistItemState`, `schemas.py` = §2/§4, `errors.py` = §1), 10 routers + `ai/router_assistant.py` + `ai/router_voice.py` all stubbed with §4 data, W1 stub stream. `tests/test_b0_stubs.py` 15/15 pass; uvicorn boots, `/docs` lists all 26 contract paths + `/health`. `.gitignore` for estimator/chroma. SETUP §3 → python3.11. | B1 seed, then B2 core endpoints + B3 fatigue. |
