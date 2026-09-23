@@ -115,7 +115,9 @@ def build(force: bool = False):
         existing = next((c for c in client.list_collections() if c.name == COLLECTION), None)
         if existing is not None and not force:
             col = client.get_collection(COLLECTION, embedding_function=None)
-            if (col.metadata or {}).get("content_hash") == digest:
+            # Reuse only a complete store: an interrupted build (e.g. `uvicorn --reload`
+            # restarting mid-embedding) must never be trusted, whatever its metadata says.
+            if (col.metadata or {}).get("content_hash") == digest and col.count() == len(chunks):
                 _collection = col
                 return col
         if existing is not None:
@@ -123,7 +125,7 @@ def build(force: bool = False):
         col = client.create_collection(
             COLLECTION, embedding_function=None,
             configuration={"hnsw": {"space": "cosine"}},
-            metadata={"content_hash": digest, "embedding_model": settings.EMBEDDING_MODEL},
+            metadata={"content_hash": "building", "embedding_model": settings.EMBEDDING_MODEL},
         )
         if chunks:
             col.add(
@@ -133,6 +135,8 @@ def build(force: bool = False):
                 metadatas=[{"doc": c.doc, "machine_type": c.machine_type, "section": c.section}
                            for c in chunks],
             )
+        # Mark complete only after every section is in.
+        col.modify(metadata={"content_hash": digest, "embedding_model": settings.EMBEDDING_MODEL})
         log.info("rag: indexed %d manual sections (%s)", len(chunks), digest)
         _collection = col
         return col

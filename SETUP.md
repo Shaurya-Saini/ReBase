@@ -34,7 +34,7 @@ echo "I am Person A (Edge AI + UI)" > CLAUDE.local.md   # or "I am Person B (Inf
 ```bash
 cd backend
 python3.11 -m venv .venv && source .venv/bin/activate   # isolated Python 3.11 env (Windows: .venv\Scripts\activate). With uv: uv venv --python 3.11 .venv
-pip install -r requirements.txt                      # fastapi, xgboost, chromadb, sentence-transformers, ... (first install downloads torch, a few minutes)
+pip install -r requirements.txt                      # fastapi, xgboost, chromadb, sentence-transformers, ... (downloads torch: ~10 min the first time)
 ```
 
 ### 3.2 Seed the database + build models
@@ -233,7 +233,9 @@ asyncio.run(main())"
 
 ## 8. Fresh-clone check  [Owner: both — B leads at M5]
 
-- [ ] Followed sections 2–6 in a new folder, no step failed
+- [x] **Backend** (B, 2026-09-24): sections 2–3 followed literally in a clean copy of the repo (no `.env` keys, no DB, no models, new venv): install ✅ (~9 min), seed + train ✅, `pytest` 215/215 ✅, server + scripted demo flow 20/20 ✅ (login, fatigue cast, estimate, Mohit blocked, hose-leak gate, Tamil briefing, live WS + scenario, alert + ack, assistant, training, TTS 503, summary). Caveat: the embedding model was already in the local cache — on a new machine the first server start also downloads it (~90 MB)
+- [ ] **App** (A): sections 4 + 6 in a new folder, no step failed
+- [ ] Final run of both at M5 (after the last commits)
 - [ ] Mock mode works with backend off
 - [ ] Edge CV fires a real alert from the camera; telemetry scenarios fire on-device rules
 - [ ] All demo scenarios in `docs/DEMO.md` work
