@@ -1,16 +1,25 @@
-// Skeleton — routes on-device AlertDrafts (from rules + CV) to the backend
+// Routes on-device AlertDrafts (from the rule engine + camera CV) to the backend
 // incident log via E18 (POST /sessions/{id}/alerts).
 
+import 'package:app/core/api/api_client.dart';
+import 'package:app/core/models/models.dart';
 import 'package:app/edge/telemetry_rules.dart' show AlertDraft;
 
-/// TODO A8/A9: convert AlertDraft -> core `AlertCreate` and call
-/// `apiClientProvider.postAlert(sessionId, alert)` (CONTRACT §6.1, E18).
 class AlertDispatcher {
-  AlertDispatcher(this.sessionId);
+  AlertDispatcher(this._api, this.sessionId);
 
+  final ApiClient _api;
   final String sessionId;
 
-  Future<void> dispatch(AlertDraft draft) async {
-    // TODO: await apiClient.postAlert(sessionId, draft.toAlertCreate());
-  }
+  /// Stamps the draft with a timestamp and posts it; returns the stored Alert.
+  Future<Alert> dispatch(AlertDraft d) => _api.postAlert(
+        sessionId,
+        AlertCreate(
+          type: d.type,
+          source: d.source,
+          severity: d.severity,
+          message: d.message,
+          ts: DateTime.now().toUtc().toIso8601String(),
+        ),
+      );
 }

@@ -1,0 +1,34 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:app/core/api/providers.dart';
+import 'package:app/core/models/models.dart';
+
+/// All operators (login picker).
+final operatorsProvider = FutureProvider.autoDispose<List<Operator>>(
+    (ref) => ref.watch(apiClientProvider).operators());
+
+/// The operator chosen at login — drives the dashboard and session flow.
+final selectedOperatorProvider = StateProvider<Operator?>((ref) => null);
+
+/// Selected assignment range on the dashboard.
+final rangeProvider = StateProvider<String>((ref) => 'day');
+
+/// Assignments for an operator + range.
+final assignmentsProvider = FutureProvider.autoDispose
+    .family<List<Assignment>, ({String operatorId, String range})>(
+  (ref, args) => ref
+      .watch(apiClientProvider)
+      .assignments(args.operatorId, range: args.range),
+);
+
+/// All machines (used to resolve one of the job's type when starting a session).
+final machinesProvider = FutureProvider.autoDispose<List<Machine>>(
+    (ref) => ref.watch(apiClientProvider).machines());
+
+/// One job (A4).
+final jobProvider = FutureProvider.autoDispose
+    .family<Job, String>((ref, id) => ref.watch(apiClientProvider).job(id));
+
+/// XGBoost estimate for a job (A4).
+final estimateProvider = FutureProvider.autoDispose.family<Estimate, String>(
+    (ref, jobId) => ref.watch(apiClientProvider).estimate(jobId));
