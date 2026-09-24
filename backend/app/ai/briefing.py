@@ -2,9 +2,9 @@
 
 The facts (machine, job, estimate, hazards, defects, fatigue) are gathered
 here; the LLM only rewrites them as a short briefing in `lang`. Without an LLM
-(no key, timeout, refusal) the template below produces the same shape, with
-fixed phrases in en/hi/ta; free-text data (job titles, site hazards) stays in
-English in that case. Hindi/Tamil phrases want a native-speaker review.
+(no key, timeout, refusal) the template below produces the same shape, fully in
+en/hi/ta: fixed phrases here, job title/site/hazards, machine model and checklist
+defects from data/i18n (app/i18n.py). Hindi/Tamil want a native-speaker review.
 """
 
 import logging
@@ -15,6 +15,7 @@ from sqlmodel import Session
 from app import models
 from app.ai.llm import LLMUnavailable, complete_json
 from app.clock import IST, today_ist
+from app.i18n import tr, tr_entity
 from app.services import sessions as svc
 from app.services.estimates import predict_job
 from app.services.fatigue import operator_fatigue
@@ -120,18 +121,22 @@ def _facts(db: Session, s: models.WorkSession) -> dict:
 def template_briefing(f: dict, lang: str) -> dict:
     p = PHRASES.get(lang, PHRASES["en-IN"])
     m, j = f["machine"], f["job"]
-    hazards = list(j.hazards)
+    hazards = tr_entity(lang, "jobs", j.id, "hazards", list(j.hazards))
     if j.weather in ("rain", "heat", "wind"):
         hazards.append(p[j.weather])
     for d in f["defects"]:
-        hazards.append(p["defect"].format(text=d["text"]) + (f" ({d['note']})" if d["note"] else ""))
+        text = tr(lang, "checklist_items", d["text"], d["text"])
+        hazards.append(p["defect"].format(text=text) + (f" ({d['note']})" if d["note"] else ""))
     reminders = [p["seatbelt"], p["crew"], p[m.type]]
     if f["rest"]["status"] == "warning":
         reminders.append(p["fatigue"])
     return {
-        "machine_summary": p["machine"].format(model=m.model, hours=f"{m.hour_meter:.0f}",
+        "machine_summary": p["machine"].format(model=tr_entity(lang, "machines", m.id, "model", m.model),
+                                               hours=f"{m.hour_meter:.0f}",
                                                when=_when(m.last_inspection, p)),
-        "job_summary": p["job"].format(title=j.title, site=j.site, planned=f"{j.planned_hours:g}",
+        "job_summary": p["job"].format(title=tr_entity(lang, "jobs", j.id, "title", j.title),
+                                       site=tr_entity(lang, "jobs", j.id, "site", j.site),
+                                       planned=f"{j.planned_hours:g}",
                                        time=j.scheduled_start.astimezone(IST).strftime("%H:%M")),
         "hazards": hazards,
         "reminders": reminders,

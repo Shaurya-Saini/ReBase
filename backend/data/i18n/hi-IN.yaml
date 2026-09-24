@@ -1,0 +1,110 @@
+# Hindi display text for seeded data + checklist content (hand-written; native review welcome).
+# Keys: entity ids, or the exact English text for checklist items/sections. IDs/enums are never translated.
+
+operators:
+  op_001: {name: "रवि कुमार"}
+  op_002: {name: "प्रिया शर्मा"}
+  op_003: {name: "अर्जुन मुरुगन"}
+  op_004: {name: "मोहित वर्मा"}
+  op_005: {name: "सैम डिसूज़ा"}
+
+machines:
+  mc_001: {model: "जेनेरिक 20 टन एक्सकेवेटर"}
+  mc_002: {model: "जेनेरिक 3.5 m³ व्हील लोडर"}
+  mc_003: {model: "जेनेरिक क्रॉलर ड्रिल रिग"}
+  mc_004: {model: "जेनेरिक 40 टन आर्टिकुलेटेड डंप ट्रक"}
+
+jobs:
+  job_001:
+    title: "खाई की खुदाई – ब्लॉक C"
+    site: "साइट 2, नॉर्थ पिट"
+    hazards: ["पूर्वी किनारे के पास ऊपर से गुज़रती बिजली की लाइन", "बारिश के बाद नरम ज़मीन"]
+  job_002:
+    title: "स्टॉकपाइल लोडिंग – बे 3"
+    site: "साइट 2, नॉर्थ पिट"
+    hazards: ["बे 3 के निकास पर व्यस्त हॉल रोड क्रॉसिंग"]
+  job_003:
+    title: "ब्लास्ट-होल ड्रिलिंग – बेंच 5"
+    site: "साइट 2, नॉर्थ पिट"
+    hazards: ["बेंच का किनारा 5 m के भीतर", "बहुत धूल — केबिन बंद रखें"]
+  job_004:
+    title: "मलबे की ढुलाई – डंप B तक"
+    site: "साइट 2, नॉर्थ पिट"
+    hazards: ["रात की ढुलाई — रैंप 2 पर कम दृश्यता"]
+  job_005:
+    title: "जल निकासी नाली – Ch. 4+200 से 4+450"
+    site: "NH-44 कट, सेक्शन 4"
+    hazards: ["काम के क्षेत्र से 8 m पर चालू ट्रैफ़िक"]
+  job_006:
+    title: "सबग्रेड लोडिंग – Ch. 4+500"
+    site: "NH-44 कट, सेक्शन 4"
+    hazards: ["सड़क के पार हवा से उड़ती धूल"]
+  job_007:
+    title: "चट्टान कटाई ड्रिलिंग – Ch. 4+800"
+    site: "NH-44 कट, सेक्शन 4"
+    hazards: ["ऊपरी सतह पर ढीली चट्टान"]
+  job_008:
+    title: "मलबे की ढुलाई – निपटान यार्ड तक"
+    site: "NH-44 कट, सेक्शन 4"
+    hazards: ["गीली होने पर फिसलन भरी कच्ची हॉल रोड"]
+
+checklist_sections:
+  "Walk-around": "चारों ओर की जाँच"
+  "Fluids": "तरल पदार्थ"
+  "Cab and controls": "केबिन और नियंत्रण"
+  "Safety devices": "सुरक्षा उपकरण"
+
+checklist_items:
+  "Check tracks and undercarriage for damage": "ट्रैक और अंडरकैरिज में नुकसान जाँचें"
+  "Check hydraulic hoses for leaks": "हाइड्रोलिक होज़ में रिसाव जाँचें"
+  "Check boom, arm and bucket pins and bushings for wear or missing retainers": "बूम, आर्म और बकेट की पिन व बुशिंग में घिसाव या गायब रिटेनर जाँचें"
+  "Check bucket teeth and cutting edge": "बकेट के दाँत और कटिंग एज जाँचें"
+  "Check for cracks or damage on boom, arm and counterweight": "बूम, आर्म और काउंटरवेट पर दरार या नुकसान जाँचें"
+  "Check engine oil level": "इंजन ऑयल का स्तर जाँचें"
+  "Check hydraulic oil level": "हाइड्रोलिक ऑयल का स्तर जाँचें"
+  "Check coolant level": "कूलेंट का स्तर जाँचें"
+  "Look under the machine for fresh fuel, oil or coolant leaks": "मशीन के नीचे ताज़ा ईंधन, ऑयल या कूलेंट का रिसाव देखें"
+  "Seatbelt latches and is not frayed": "सीटबेल्ट ठीक से लॉक होती है और घिसी हुई नहीं है"
+  "Swing and travel brakes hold": "स्विंग और ट्रैवल ब्रेक ठीक से पकड़ते हैं"
+  "Joysticks return to neutral; hydraulic lock lever works": "जॉयस्टिक न्यूट्रल में लौटते हैं; हाइड्रोलिक लॉक लीवर काम करता है"
+  "Windows and mirrors clean and undamaged": "खिड़कियाँ और शीशे साफ़ हैं और टूटे नहीं हैं"
+  "Horn works": "हॉर्न काम करता है"
+  "Travel alarm sounds": "ट्रैवल अलार्म बजता है"
+  "Work lights work": "वर्क लाइट काम करती हैं"
+  "Fire extinguisher present and charged": "अग्निशामक मौजूद है और भरा हुआ है"
+  "Access steps and handrails secure": "चढ़ने की सीढ़ियाँ और हैंडरेल मज़बूत हैं"
+  "Check tyres for cuts, bulges and correct inflation": "टायरों में कट, उभार और सही हवा का दबाव जाँचें"
+  "Check hydraulic hoses and cylinders for leaks": "हाइड्रोलिक होज़ और सिलेंडर में रिसाव जाँचें"
+  "Check lift arm and bucket pins for wear or missing retainers": "लिफ़्ट आर्म और बकेट पिन में घिसाव या गायब रिटेनर जाँचें"
+  "Check bucket cutting edge and teeth": "बकेट की कटिंग एज और दाँत जाँचें"
+  "Articulation lock pin removed and stowed": "आर्टिकुलेशन लॉक पिन निकालकर अपनी जगह रखी गई है"
+  "Check hydraulic and transmission oil levels": "हाइड्रोलिक और ट्रांसमिशन ऑयल का स्तर जाँचें"
+  "Service and parking brakes hold": "सर्विस और पार्किंग ब्रेक ठीक से पकड़ते हैं"
+  "Steering responds smoothly in both directions": "स्टीयरिंग दोनों दिशाओं में आसानी से घूमता है"
+  "Reverse alarm sounds": "रिवर्स अलार्म बजता है"
+  "Head, tail and work lights work": "हेड, टेल और वर्क लाइट काम करती हैं"
+  "Check hydraulic hoses on feed and boom for leaks": "फ़ीड और बूम के हाइड्रोलिक होज़ में रिसाव जाँचें"
+  "Check mast, feed beam and centralizer for cracks or loose bolts": "मास्ट, फ़ीड बीम और सेंट्रलाइज़र में दरार या ढीले बोल्ट जाँचें"
+  "Check drill rods, bit and shank adapter for wear": "ड्रिल रॉड, बिट और शैंक एडेप्टर में घिसाव जाँचें"
+  "Check dust collector and hoses are intact": "जाँचें कि डस्ट कलेक्टर और होज़ सही-सलामत हैं"
+  "Check engine and compressor oil levels": "इंजन और कंप्रेसर ऑयल का स्तर जाँचें"
+  "Tramming brakes hold": "ट्रैमिंग ब्रेक ठीक से पकड़ते हैं"
+  "Rotation and feed controls return to neutral": "रोटेशन और फ़ीड कंट्रोल न्यूट्रल में लौटते हैं"
+  "Emergency stop buttons work (cab and drill deck)": "इमरजेंसी स्टॉप बटन काम करते हैं (केबिन और ड्रिल डेक)"
+  "Rotation guard / rod-handling guard in place": "रोटेशन गार्ड / रॉड-हैंडलिंग गार्ड लगा हुआ है"
+  "Horn and travel alarm work": "हॉर्न और ट्रैवल अलार्म काम करते हैं"
+  "Check wheel nuts are tight and none missing": "जाँचें कि व्हील नट कसे हैं और कोई गायब नहीं है"
+  "Check body hoist cylinders and hoses for leaks": "बॉडी होइस्ट सिलेंडर और होज़ में रिसाव जाँचें"
+  "Check tailgate and body pins": "टेलगेट और बॉडी पिन जाँचें"
+  "Articulation lock removed and stowed": "आर्टिकुलेशन लॉक निकालकर अपनी जगह रखा गया है"
+  "Check transmission and hydraulic oil levels": "ट्रांसमिशन और हाइड्रोलिक ऑयल का स्तर जाँचें"
+  "Service, parking and retarder brakes work": "सर्विस, पार्किंग और रिटार्डर ब्रेक काम करते हैं"
+  "Mirrors and camera screen clean and adjusted": "शीशे और कैमरा स्क्रीन साफ़ और सही सेट हैं"
+  "Head, brake and indicator lights work": "हेड, ब्रेक और इंडिकेटर लाइट काम करती हैं"
+  "Body-up warning light works": "बॉडी-अप चेतावनी लाइट काम करती है"
+
+terms:
+  machine_types: {excavator: "एक्सकेवेटर", wheel_loader: "व्हील लोडर", drill_rig: "ड्रिल रिग", dump_truck: "डंप ट्रक"}
+  levels: {novice: "नौसिखिया", intermediate: "मध्यम अनुभवी", expert: "विशेषज्ञ"}
+  weather_notes: {clear: "मौसम साफ़ रहेगा", rain: "बारिश का पूर्वानुमान", heat: "तेज़ गर्मी का पूर्वानुमान", wind: "तेज़ हवा का पूर्वानुमान"}
+  experience_note: "{machine} पर {level}"
