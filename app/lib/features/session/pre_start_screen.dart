@@ -61,7 +61,7 @@ class _PreStartScreenState extends ConsumerState<PreStartScreen> {
       return;
     }
     await ref.read(apiClientProvider).completeChecklist(widget.sessionId);
-    if (mounted) context.go('/session/${widget.sessionId}/briefing');
+    if (mounted) context.push('/session/${widget.sessionId}/briefing');
   }
 
   @override

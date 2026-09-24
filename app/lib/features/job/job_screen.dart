@@ -26,7 +26,7 @@ class JobScreen extends ConsumerWidget {
       machineId: machine.id,
       jobId: job.id,
     );
-    if (context.mounted) context.go('/session/${session.id}/pre-start');
+    if (context.mounted) context.push('/session/${session.id}/pre-start');
   }
 
   @override

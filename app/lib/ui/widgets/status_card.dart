@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:app/ui/theme.dart';
 
-/// Labelled status tile (hours, rest, machine status, etc.). CONTRACT §6.2.
+/// Rugged status tile: colored machine-style accent stripe, boxed icon, small
+/// uppercase label, large bold value. CONTRACT §6.2.
 class StatusCard extends StatelessWidget {
   const StatusCard({
     super.key,
@@ -17,29 +19,57 @@ class StatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = color ?? AppTheme.amber;
     return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+      child: IntrinsicHeight(
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (icon != null) ...[
-              Icon(icon, color: color, size: 32),
-              const SizedBox(width: 12),
-            ],
+            Container(width: 6, color: accent),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: Theme.of(context).textTheme.labelLarge),
-                  const SizedBox(height: 4),
-                  Text(
-                    value,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineSmall
-                        ?.copyWith(color: color),
-                  ),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  children: [
+                    if (icon != null) ...[
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: accent.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(icon, color: accent, size: 26),
+                      ),
+                      const SizedBox(width: 12),
+                    ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            title.toUpperCase(),
+                            style: const TextStyle(
+                                color: AppTheme.muted,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.8),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            value,
+                            style: TextStyle(
+                                color: color ?? AppTheme.offWhite,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w800),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

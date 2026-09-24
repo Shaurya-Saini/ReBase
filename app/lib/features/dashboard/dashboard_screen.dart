@@ -40,7 +40,7 @@ class DashboardScreen extends ConsumerWidget {
             icon: const Icon(Icons.school),
             tooltip: t.nav_training,
             onPressed: () => context
-                .go('/training?operatorId=${op.id}&machineType=excavator'),
+                .push('/training?operatorId=${op.id}&machineType=excavator'),
           ),
         ],
       ),
@@ -99,7 +99,7 @@ class DashboardScreen extends ConsumerWidget {
                                   subtitle: Text(
                                       '${a.job.site} · ${a.machine.model} · ${a.shift}'),
                                   trailing: const Icon(Icons.chevron_right),
-                                  onTap: () => context.go('/job/${a.job.id}'),
+                                  onTap: () => context.push('/job/${a.job.id}'),
                                 ),
                               ))
                           .toList(),

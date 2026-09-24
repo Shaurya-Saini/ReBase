@@ -8,6 +8,7 @@ import 'package:app/core/api/ws_client.dart';
 import 'package:app/core/config.dart';
 import 'package:app/core/models/models.dart';
 import 'package:app/edge/alert_dispatch.dart';
+import 'package:app/edge/edge_model.dart';
 import 'package:app/edge/telemetry_rules.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/ui/alert_text.dart';
@@ -27,6 +28,7 @@ class LiveScreen extends ConsumerStatefulWidget {
 
 class _LiveScreenState extends ConsumerState<LiveScreen> {
   final TelemetryRuleEngine _rules = TelemetryRuleEngine();
+  final EdgeSafetyModel _model = EdgeSafetyModel();
   late final AlertDispatcher _dispatcher;
   final List<Alert> _active = [];
   Telemetry? _latest;
@@ -36,11 +38,22 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     super.initState();
     _dispatcher =
         AlertDispatcher(ref.read(apiClientProvider), widget.sessionId);
+    _model.load(); // uses the trained model if bundled; else rules
+  }
+
+  @override
+  void dispose() {
+    _model.close();
+    super.dispose();
   }
 
   void _onTelemetry(Telemetry telemetry) {
     setState(() => _latest = telemetry);
-    for (final draft in _rules.evaluate(telemetry.toData())) {
+    // Learned edge model when available, threshold rules otherwise.
+    final drafts = _model.isLoaded
+        ? _model.evaluate(telemetry)
+        : _rules.evaluate(telemetry.toData());
+    for (final draft in drafts) {
       _fire(draft);
     }
   }
@@ -98,7 +111,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
           IconButton(
             icon: const Icon(Icons.chat),
             tooltip: t.assistant_title,
-            onPressed: () => context.go('/assistant'),
+            onPressed: () => context.push('/assistant'),
           ),
         ],
       ),
@@ -116,7 +129,7 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
                 ? const Center(child: CircularProgressIndicator())
                 : _gauges(tele),
           ),
-          if (AppConfig.useMock) _demoTriggers(),
+          _demoTriggers(),
           Padding(
             padding: const EdgeInsets.all(12),
             child: SizedBox(
@@ -189,8 +202,18 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     );
   }
 
-  /// Mock-only buttons so alerts are demoable without the backend simulator.
-  /// (On a real device the camera CV of A9 raises the edge_cv alerts.)
+  /// Demo controls. Mock mode injects crafted telemetry locally; real mode
+  /// steers the backend simulator (E22) so the actual telemetry stream changes
+  /// and the on-device rules fire. The camera CV trigger stays local (the real
+  /// camera raises edge_cv alerts on device — A9).
+  void _demo(String event, Telemetry crafted) {
+    if (AppConfig.useMock) {
+      _onTelemetry(crafted);
+    } else {
+      ref.read(apiClientProvider).triggerScenario(widget.sessionId, event);
+    }
+  }
+
   Widget _demoTriggers() => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Wrap(
@@ -198,13 +221,13 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
           children: [
             OutlinedButton(
                 onPressed: () =>
-                    _onTelemetry(_craft(seatbelt: false, speed: 5)),
+                    _demo('seatbelt_off', _craft(seatbelt: false, speed: 5)),
                 child: const Text('Seatbelt')),
             OutlinedButton(
-                onPressed: () => _onTelemetry(_craft(proximity: 1.2)),
+                onPressed: () => _demo('proximity', _craft(proximity: 1.2)),
                 child: const Text('Proximity')),
             OutlinedButton(
-                onPressed: () => _onTelemetry(_craft(temp: 110)),
+                onPressed: () => _demo('overheat', _craft(temp: 110)),
                 child: const Text('Overheat')),
             OutlinedButton(
                 onPressed: () => _fire(AlertDraft(

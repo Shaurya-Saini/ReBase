@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:app/ui/theme.dart';
 
-/// Safety alert banner: colour + icon + text (never colour alone) + one big ack tap.
-/// CONTRACT §6.2. `severity` is 'info' | 'warning' | 'critical'.
+/// Safety alert strip: full-bleed severity colour + icon + bold text (never
+/// colour alone) + one big charcoal ACK. CONTRACT §6.2.
+/// `severity` is 'info' | 'warning' | 'critical'.
 class AlertBanner extends StatelessWidget {
   const AlertBanner({
     super.key,
@@ -25,26 +26,32 @@ class AlertBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bg = AppTheme.severityColor(severity);
+    final fg = severity == 'critical' ? Colors.white : AppTheme.charcoal;
     return Material(
-      color: AppTheme.severityColor(severity),
+      color: bg,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Icon(_icon, color: Colors.black, size: 40),
+            Icon(_icon, color: fg, size: 40),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(title,
-                      style: const TextStyle(
-                          color: Colors.black,
+                      style: TextStyle(
+                          color: fg,
                           fontSize: 22,
-                          fontWeight: FontWeight.bold)),
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.3)),
                   Text(message,
-                      style:
-                          const TextStyle(color: Colors.black87, fontSize: 18)),
+                      style: TextStyle(
+                          color: fg.withValues(alpha: 0.85),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600)),
                 ],
               ),
             ),
@@ -53,8 +60,8 @@ class AlertBanner extends StatelessWidget {
               height: AppTheme.minTouch,
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white),
+                    backgroundColor: AppTheme.charcoal,
+                    foregroundColor: AppTheme.offWhite),
                 onPressed: onAck,
                 child: const Text('ACK'),
               ),

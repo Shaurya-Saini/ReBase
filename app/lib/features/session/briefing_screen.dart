@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:app/core/api/data_providers.dart';
+import 'package:app/core/api/providers.dart';
 import 'package:app/core/lang.dart';
 import 'package:app/core/locale.dart';
 import 'package:app/core/models/models.dart';
@@ -58,7 +59,14 @@ class BriefingScreen extends ConsumerWidget {
             BigButton(
               label: t.action_start_work,
               icon: Icons.play_arrow,
-              onPressed: () => context.go('/session/$sessionId/live'),
+              // E16: move the session to `active` before the live screen, so
+              // ending it later (E17) doesn't 409.
+              onPressed: () async {
+                await ref.read(apiClientProvider).startSession(sessionId);
+                if (context.mounted) {
+                  context.push('/session/$sessionId/live');
+                }
+              },
             ),
           ],
         ),

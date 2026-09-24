@@ -165,4 +165,14 @@ class HttpApiClient implements ApiClient {
     await _dio.post('/training/$moduleId/complete',
         data: {'operator_id': operatorId, 'score': score});
   }
+
+  @override
+  Future<List<String>> simScenarios() async =>
+      ((await _dio.get('/sim/scenarios')).data as List).cast<String>();
+
+  @override
+  Future<void> triggerScenario(String sessionId, String event) async {
+    await _dio
+        .post('/sim/scenario', data: {'session_id': sessionId, 'event': event});
+  }
 }

@@ -79,7 +79,8 @@ class AppLocalizationsTa extends AppLocalizations {
   String get checklist_title => 'தொடக்கத்திற்கு முந்தைய சரிபார்ப்பு பட்டியல்';
 
   @override
-  String get checklist_complete_blocked => 'தொடங்குவதற்கு முன் தீவிர குறைபாடுகளை சரிசெய்யவும்';
+  String get checklist_complete_blocked =>
+      'தொடங்குவதற்கு முன் தீவிர குறைபாடுகளை சரிசெய்யவும்';
 
   @override
   String get briefing_title => 'சுருக்க விளக்கம்';

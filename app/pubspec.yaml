@@ -19,6 +19,7 @@ dependencies:
   intl: any
   flutter_tts: ^4.2.0
   speech_to_text: ^7.0.0
+  tflite_flutter: ^0.11.0
   # Edge CV deps added when A9 is wired on device (google_mlkit_face_detection,
   # camera) — kept out until then to keep resolution light.
 
@@ -30,3 +31,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+  assets:
+    - assets/models/

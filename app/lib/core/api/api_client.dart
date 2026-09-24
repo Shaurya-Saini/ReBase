@@ -44,4 +44,7 @@ abstract class ApiClient {
     required String operatorId,
     required int score,
   }); // E27
+  Future<List<String>> simScenarios(); // E21 — demo control
+  Future<void> triggerScenario(
+      String sessionId, String event); // E22 — demo control
 }

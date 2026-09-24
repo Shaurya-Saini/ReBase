@@ -154,4 +154,19 @@ class MockApiClient implements ApiClient {
     required int score,
   }) =>
       _delay<void>(null);
+
+  @override
+  Future<List<String>> simScenarios() => _delay(const [
+        'normal',
+        'seatbelt_off',
+        'proximity',
+        'excessive_idle',
+        'overheat',
+        'overload',
+        'unsafe_operation',
+      ]);
+
+  @override
+  Future<void> triggerScenario(String sessionId, String event) =>
+      _delay<void>(null);
 }

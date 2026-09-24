@@ -1,16 +1,40 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
+import 'package:app/core/config.dart';
 import 'package:app/core/models/telemetry.dart';
 
-/// Telemetry stream for a session (CONTRACT §5). M1: a fake 1 Hz generator so
-/// the live gauges + edge rule engine work without a backend. A17 swaps in a
-/// real WebSocket (`web_socket_channel`) when `USE_MOCK=false`.
+/// Telemetry stream for a session (CONTRACT §5).
+/// - `USE_MOCK=true`: a fake 1 Hz generator so the live gauges + edge rule
+///   engine work with no backend.
+/// - `USE_MOCK=false`: the real backend WebSocket `/ws/sessions/{id}`. The
+///   simulator (steered via `POST /sim/scenario`) changes these values so the
+///   on-device rules fire — that's the demo control.
 final telemetryStreamProvider =
     StreamProvider.family<Telemetry, String>((ref, sessionId) {
-  return mockTelemetryStream();
+  return AppConfig.useMock
+      ? mockTelemetryStream()
+      : backendTelemetryStream(sessionId);
 });
+
+Stream<Telemetry> backendTelemetryStream(String sessionId) async* {
+  final wsBase = AppConfig.apiBase.replaceFirst('http', 'ws');
+  final channel =
+      WebSocketChannel.connect(Uri.parse('$wsBase/ws/sessions/$sessionId'));
+  try {
+    await for (final raw in channel.stream) {
+      final msg = jsonDecode(raw as String) as Map<String, dynamic>;
+      if (msg['type'] == 'telemetry') {
+        yield Telemetry.fromWsMessage(msg);
+      }
+    }
+  } finally {
+    await channel.sink.close();
+  }
+}
 
 Stream<Telemetry> mockTelemetryStream() async* {
   final rnd = Random();
