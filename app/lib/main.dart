@@ -19,7 +19,7 @@ class ReBaseApp extends ConsumerWidget {
       title: 'ReBase',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark(),
-      routerConfig: buildRouter(),
+      routerConfig: ref.watch(routerProvider),
       locale: locale,
       supportedLocales: AppLocalizations.supportedLocales,
       localizationsDelegates: const [

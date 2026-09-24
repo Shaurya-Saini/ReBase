@@ -51,12 +51,14 @@ class JobScreen extends ConsumerWidget {
             Row(children: [
               Expanded(
                   child: StatusCard(
-                      title: 'Planned',
+                      title: t.job_planned,
                       value: '${job.plannedHours.toStringAsFixed(1)} h',
                       icon: Icons.schedule)),
               Expanded(
                   child: StatusCard(
-                      title: 'Status', value: job.status, icon: Icons.flag)),
+                      title: t.common_status,
+                      value: job.status,
+                      icon: Icons.flag)),
             ]),
             const SizedBox(height: 12),
             estimateAsync.when(
@@ -107,7 +109,7 @@ class JobScreen extends ConsumerWidget {
             }),
             if (est.projectCompletionDate != null) ...[
               const Divider(height: 24),
-              Text('Project completion: ${est.projectCompletionDate}'),
+              Text('${t.job_project_completion}: ${est.projectCompletionDate}'),
             ],
           ],
         ),

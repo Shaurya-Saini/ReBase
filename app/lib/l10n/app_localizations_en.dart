@@ -79,8 +79,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get checklist_title => 'Pre-start checklist';
 
   @override
-  String get checklist_complete_blocked =>
-      'Fix critical defects before starting';
+  String get checklist_complete_blocked => 'Fix critical defects before starting';
 
   @override
   String get briefing_title => 'Briefing';
@@ -120,4 +119,103 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get alert_unsafe_operation => 'Unsafe operation detected';
+
+  @override
+  String get range_day => 'Day';
+
+  @override
+  String get range_week => 'Week';
+
+  @override
+  String get range_month => 'Month';
+
+  @override
+  String get common_status => 'Status';
+
+  @override
+  String get common_on => 'On';
+
+  @override
+  String get common_off => 'Off';
+
+  @override
+  String get common_ok => 'OK';
+
+  @override
+  String get job_planned => 'Planned';
+
+  @override
+  String get job_project_completion => 'Project completion';
+
+  @override
+  String get checklist_based_on => 'Based on';
+
+  @override
+  String get chk_ok => 'OK';
+
+  @override
+  String get chk_defect => 'Defect';
+
+  @override
+  String get chk_na => 'N/A';
+
+  @override
+  String get chk_critical => 'CRITICAL';
+
+  @override
+  String get checklist_answer_all => 'Answer all items first';
+
+  @override
+  String get briefing_machine => 'Machine';
+
+  @override
+  String get briefing_job => 'Job';
+
+  @override
+  String get briefing_hazards => 'Hazards';
+
+  @override
+  String get briefing_reminders => 'Reminders';
+
+  @override
+  String get action_read_aloud => 'Read aloud';
+
+  @override
+  String get live_summary_title => 'Session summary';
+
+  @override
+  String get live_duration => 'Duration';
+
+  @override
+  String get live_alerts => 'Alerts';
+
+  @override
+  String get live_idle => 'Idle';
+
+  @override
+  String get gauge_rpm => 'RPM';
+
+  @override
+  String get gauge_temp => 'Temp';
+
+  @override
+  String get gauge_fuel => 'Fuel';
+
+  @override
+  String get gauge_load => 'Load';
+
+  @override
+  String get gauge_speed => 'Speed';
+
+  @override
+  String get gauge_proximity => 'Proximity';
+
+  @override
+  String get gauge_idle => 'Idle';
+
+  @override
+  String get gauge_seatbelt => 'Seatbelt';
+
+  @override
+  String get assistant_source => 'Source';
 }

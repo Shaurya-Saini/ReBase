@@ -71,10 +71,10 @@ class DashboardScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: SegmentedButton<String>(
-              segments: const [
-                ButtonSegment(value: 'day', label: Text('Day')),
-                ButtonSegment(value: 'week', label: Text('Week')),
-                ButtonSegment(value: 'month', label: Text('Month')),
+              segments: [
+                ButtonSegment(value: 'day', label: Text(t.range_day)),
+                ButtonSegment(value: 'week', label: Text(t.range_week)),
+                ButtonSegment(value: 'month', label: Text(t.range_month)),
               ],
               selected: {range},
               onSelectionChanged: (s) =>

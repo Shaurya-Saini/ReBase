@@ -21,8 +21,6 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 const _langChoices = {'en': 'English', 'hi': 'हिन्दी', 'ta': 'தமிழ்'};
 
-String _langCode(String contractLang) => contractLang.split('-').first;
-
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   Operator? _selected;
   final _pin = TextEditingController();
@@ -34,7 +32,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  bool get _canContinue => _selected != null && _pin.text.length == 4 && !_busy;
+  // Open PIN: any non-empty PIN is accepted (hackathon; not secure).
+  bool get _canContinue => _selected != null && _pin.text.isNotEmpty && !_busy;
 
   void _pickLang(String code) =>
       ref.read(localeProvider.notifier).state = Locale(code);
@@ -102,10 +101,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         title:
                             Text(op.name, style: const TextStyle(fontSize: 20)),
                         subtitle: Text(op.experience.keys.join(', ')),
-                        onTap: () {
-                          setState(() => _selected = op);
-                          _pickLang(_langCode(op.lang));
-                        },
+                        onTap: () => setState(() => _selected = op),
                       ),
                     );
                   }).toList(),

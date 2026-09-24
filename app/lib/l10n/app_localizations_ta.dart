@@ -79,8 +79,7 @@ class AppLocalizationsTa extends AppLocalizations {
   String get checklist_title => 'தொடக்கத்திற்கு முந்தைய சரிபார்ப்பு பட்டியல்';
 
   @override
-  String get checklist_complete_blocked =>
-      'தொடங்குவதற்கு முன் தீவிர குறைபாடுகளை சரிசெய்யவும்';
+  String get checklist_complete_blocked => 'தொடங்குவதற்கு முன் தீவிர குறைபாடுகளை சரிசெய்யவும்';
 
   @override
   String get briefing_title => 'சுருக்க விளக்கம்';
@@ -120,4 +119,103 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get alert_unsafe_operation => 'பாதுகாப்பற்ற செயல்பாடு கண்டறியப்பட்டது';
+
+  @override
+  String get range_day => 'நாள்';
+
+  @override
+  String get range_week => 'வாரம்';
+
+  @override
+  String get range_month => 'மாதம்';
+
+  @override
+  String get common_status => 'நிலை';
+
+  @override
+  String get common_on => 'இயக்கம்';
+
+  @override
+  String get common_off => 'அணைப்பு';
+
+  @override
+  String get common_ok => 'சரி';
+
+  @override
+  String get job_planned => 'திட்டமிட்டது';
+
+  @override
+  String get job_project_completion => 'திட்ட நிறைவு';
+
+  @override
+  String get checklist_based_on => 'அடிப்படையில்';
+
+  @override
+  String get chk_ok => 'சரி';
+
+  @override
+  String get chk_defect => 'குறைபாடு';
+
+  @override
+  String get chk_na => 'பொருந்தாது';
+
+  @override
+  String get chk_critical => 'முக்கியம்';
+
+  @override
+  String get checklist_answer_all => 'முதலில் அனைத்தையும் நிரப்பவும்';
+
+  @override
+  String get briefing_machine => 'இயந்திரம்';
+
+  @override
+  String get briefing_job => 'பணி';
+
+  @override
+  String get briefing_hazards => 'அபாயங்கள்';
+
+  @override
+  String get briefing_reminders => 'நினைவூட்டல்கள்';
+
+  @override
+  String get action_read_aloud => 'உரக்கப் படி';
+
+  @override
+  String get live_summary_title => 'அமர்வு சுருக்கம்';
+
+  @override
+  String get live_duration => 'கால அளவு';
+
+  @override
+  String get live_alerts => 'எச்சரிக்கைகள்';
+
+  @override
+  String get live_idle => 'சும்மா';
+
+  @override
+  String get gauge_rpm => 'RPM';
+
+  @override
+  String get gauge_temp => 'வெப்பம்';
+
+  @override
+  String get gauge_fuel => 'எரிபொருள்';
+
+  @override
+  String get gauge_load => 'சுமை';
+
+  @override
+  String get gauge_speed => 'வேகம்';
+
+  @override
+  String get gauge_proximity => 'அருகாமை';
+
+  @override
+  String get gauge_idle => 'சும்மா';
+
+  @override
+  String get gauge_seatbelt => 'இருக்கை பெல்ட்';
+
+  @override
+  String get assistant_source => 'ஆதாரம்';
 }
