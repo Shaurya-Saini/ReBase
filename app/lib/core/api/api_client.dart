@@ -2,6 +2,14 @@ import 'dart:typed_data';
 
 import 'package:app/core/models/models.dart';
 
+/// Thrown by [ApiClient.createSession] when the backend already has an open
+/// session for the operator/machine (409). `existingSessionId` lets the app
+/// resume it, so the demo can move in and out of a session without ending it.
+class SessionConflict implements Exception {
+  SessionConflict(this.existingSessionId);
+  final String? existingSessionId;
+}
+
 /// The one interface every screen talks to (CONTRACT §6.1). One method per
 /// endpoint E1–E27. `MockApiClient` and `HttpApiClient` implement it; the active
 /// one is chosen by `apiClientProvider` via `USE_MOCK`.

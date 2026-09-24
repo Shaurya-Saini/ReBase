@@ -79,8 +79,7 @@ class AppLocalizationsTa extends AppLocalizations {
   String get checklist_title => 'தொடக்கத்திற்கு முந்தைய சரிபார்ப்பு பட்டியல்';
 
   @override
-  String get checklist_complete_blocked =>
-      'தொடங்குவதற்கு முன் தீவிர குறைபாடுகளை சரிசெய்யவும்';
+  String get checklist_complete_blocked => 'தொடங்குவதற்கு முன் தீவிர குறைபாடுகளை சரிசெய்யவும்';
 
   @override
   String get briefing_title => 'சுருக்க விளக்கம்';
@@ -219,4 +218,13 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get assistant_source => 'ஆதாரம்';
+
+  @override
+  String get training_quiz => 'வினாடி வினா';
+
+  @override
+  String get action_submit => 'சமர்ப்பி';
+
+  @override
+  String get training_result => 'முடிவு';
 }

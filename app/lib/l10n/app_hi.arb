@@ -70,5 +70,8 @@
   "gauge_proximity": "निकटता",
   "gauge_idle": "निष्क्रिय",
   "gauge_seatbelt": "सीट बेल्ट",
-  "assistant_source": "स्रोत"
+  "assistant_source": "स्रोत",
+  "training_quiz": "प्रश्नोत्तरी",
+  "action_submit": "जमा करें",
+  "training_result": "परिणाम"
 }

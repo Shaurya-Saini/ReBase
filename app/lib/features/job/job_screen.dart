@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:app/core/api/api_client.dart';
 import 'package:app/core/api/data_providers.dart';
 import 'package:app/core/api/providers.dart';
 import 'package:app/core/models/models.dart';
@@ -18,15 +19,29 @@ class JobScreen extends ConsumerWidget {
   Future<void> _start(BuildContext context, WidgetRef ref, Job job) async {
     final api = ref.read(apiClientProvider);
     final op = ref.read(selectedOperatorProvider);
-    final machines = await api.machines();
-    final machine = machines.firstWhere((m) => m.type == job.machineType,
-        orElse: () => machines.first);
-    final session = await api.createSession(
-      operatorId: op?.id ?? 'op_001',
-      machineId: machine.id,
-      jobId: job.id,
-    );
-    if (context.mounted) context.push('/session/${session.id}/pre-start');
+    try {
+      final machines = await api.machines();
+      final machine = machines.firstWhere((m) => m.type == job.machineType,
+          orElse: () => machines.first);
+      final session = await api.createSession(
+        operatorId: op?.id ?? 'op_001',
+        machineId: machine.id,
+        jobId: job.id,
+      );
+      if (context.mounted) context.push('/session/${session.id}/pre-start');
+    } on SessionConflict catch (c) {
+      // A session is already open — resume it (demo: move in/out freely,
+      // no need to end it first).
+      final id = c.existingSessionId;
+      if (id == null) return;
+      final s = await api.session(id);
+      if (!context.mounted) return;
+      context.push(switch (s.state) {
+        'active' => '/session/${s.id}/live',
+        'briefing' => '/session/${s.id}/briefing',
+        _ => '/session/${s.id}/pre-start',
+      });
+    }
   }
 
   @override

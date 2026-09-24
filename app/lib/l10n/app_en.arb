@@ -71,5 +71,8 @@
   "gauge_proximity": "Proximity",
   "gauge_idle": "Idle",
   "gauge_seatbelt": "Seatbelt",
-  "assistant_source": "Source"
+  "assistant_source": "Source",
+  "training_quiz": "Quiz",
+  "action_submit": "Submit",
+  "training_result": "Result"
 }

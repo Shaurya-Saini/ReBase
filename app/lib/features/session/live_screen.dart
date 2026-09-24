@@ -8,7 +8,6 @@ import 'package:app/core/api/ws_client.dart';
 import 'package:app/core/config.dart';
 import 'package:app/core/models/models.dart';
 import 'package:app/edge/alert_dispatch.dart';
-import 'package:app/edge/edge_model.dart';
 import 'package:app/edge/telemetry_rules.dart';
 import 'package:app/l10n/app_localizations.dart';
 import 'package:app/ui/alert_text.dart';
@@ -28,7 +27,6 @@ class LiveScreen extends ConsumerStatefulWidget {
 
 class _LiveScreenState extends ConsumerState<LiveScreen> {
   final TelemetryRuleEngine _rules = TelemetryRuleEngine();
-  final EdgeSafetyModel _model = EdgeSafetyModel();
   late final AlertDispatcher _dispatcher;
   final List<Alert> _active = [];
   Telemetry? _latest;
@@ -38,22 +36,13 @@ class _LiveScreenState extends ConsumerState<LiveScreen> {
     super.initState();
     _dispatcher =
         AlertDispatcher(ref.read(apiClientProvider), widget.sessionId);
-    _model.load(); // uses the trained model if bundled; else rules
-  }
-
-  @override
-  void dispose() {
-    _model.close();
-    super.dispose();
   }
 
   void _onTelemetry(Telemetry telemetry) {
     setState(() => _latest = telemetry);
-    // Learned edge model when available, threshold rules otherwise.
-    final drafts = _model.isLoaded
-        ? _model.evaluate(telemetry)
-        : _rules.evaluate(telemetry.toData());
-    for (final draft in drafts) {
+    // Threshold rules on-device. (The edge TFLite model is wired in
+    // edge_model.dart but disabled until a model is trained — see ml/.)
+    for (final draft in _rules.evaluate(telemetry.toData())) {
       _fire(draft);
     }
   }

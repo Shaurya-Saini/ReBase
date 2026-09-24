@@ -79,8 +79,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get checklist_title => 'Pre-start checklist';
 
   @override
-  String get checklist_complete_blocked =>
-      'Fix critical defects before starting';
+  String get checklist_complete_blocked => 'Fix critical defects before starting';
 
   @override
   String get briefing_title => 'Briefing';
@@ -219,4 +218,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get assistant_source => 'Source';
+
+  @override
+  String get training_quiz => 'Quiz';
+
+  @override
+  String get action_submit => 'Submit';
+
+  @override
+  String get training_result => 'Result';
 }

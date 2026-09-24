@@ -8,11 +8,12 @@ import 'package:app/core/models/models.dart';
 /// Real backend client for `USE_MOCK=false`. Verified against B's stubbed
 /// endpoints. One-to-one with CONTRACT §3.
 class HttpApiClient implements ApiClient {
-  HttpApiClient(String baseUrl)
+  HttpApiClient(String baseUrl, {String lang = 'en-IN'})
       : _dio = Dio(BaseOptions(
           baseUrl: baseUrl,
           connectTimeout: const Duration(seconds: 5),
           receiveTimeout: const Duration(seconds: 20),
+          headers: {'Accept-Language': lang},
         ));
 
   final Dio _dio;
@@ -67,13 +68,25 @@ class HttpApiClient implements ApiClient {
     required String operatorId,
     required String machineId,
     required String jobId,
-  }) async =>
-      Session.fromJson(_m((await _dio.post('/sessions', data: {
+  }) async {
+    try {
+      final r = await _dio.post('/sessions', data: {
         'operator_id': operatorId,
         'machine_id': machineId,
         'job_id': jobId,
-      }))
-          .data));
+      });
+      return Session.fromJson(_m(r.data));
+    } on DioException catch (e) {
+      final err =
+          (e.response?.data is Map) ? (e.response!.data as Map)['error'] : null;
+      final code = err is Map ? err['code'] : null;
+      if (e.response?.statusCode == 409 &&
+          (code == 'SESSION_ALREADY_ACTIVE' || code == 'MACHINE_IN_USE')) {
+        throw SessionConflict(err is Map ? err['session_id'] as String? : null);
+      }
+      rethrow;
+    }
+  }
 
   @override
   Future<Session> session(String id) async =>

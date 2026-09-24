@@ -41,3 +41,9 @@ final checklistProvider = FutureProvider.autoDispose.family<Checklist, String>(
 final briefingProvider = FutureProvider.autoDispose
     .family<Briefing, ({String sessionId, String lang})>((ref, a) =>
         ref.watch(apiClientProvider).briefing(a.sessionId, lang: a.lang));
+
+/// Next pre-shift training module for an operator + machine (A18, E26).
+final trainingModuleProvider = FutureProvider.autoDispose
+    .family<TrainingModule, ({String operatorId, String machineType})>((ref,
+            a) =>
+        ref.watch(apiClientProvider).nextTraining(a.operatorId, a.machineType));

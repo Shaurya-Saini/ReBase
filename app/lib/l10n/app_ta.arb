@@ -70,5 +70,8 @@
   "gauge_proximity": "அருகாமை",
   "gauge_idle": "சும்மா",
   "gauge_seatbelt": "இருக்கை பெல்ட்",
-  "assistant_source": "ஆதாரம்"
+  "assistant_source": "ஆதாரம்",
+  "training_quiz": "வினாடி வினா",
+  "action_submit": "சமர்ப்பி",
+  "training_result": "முடிவு"
 }
