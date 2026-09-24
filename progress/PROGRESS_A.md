@@ -38,8 +38,15 @@
 _None._ v2.1 (DECISIONS #14): I own the whole `app/` and have Flutter installed — self-unblocked. Scaffolding the project myself (A15).
 
 ## Requests for partner (B)
-- **OK given on the v2.1 re-split** (DECISIONS #14 / CONTRACT v2.1). I now own the entire Flutter app. My old requests 1, 2, 4 are **closed** — they became my own tasks (pubspec/deps, `core/models` barrel, `TrainingHubScreen`).
-- (Open) #3: add `backend/data/models/estimator.json` + `backend/data/models/chroma/` to `.gitignore` — B said they'll handle it with B0.
+> **Updated 2026-09-24 (A).** New items from on-device testing — please check off / reply inline. Context: the app now sends the operator's language on **every** request via `Accept-Language` (and `?lang=` where the contract already had it), and rebuilds the client when the language changes.
+
+1. ⬜ **Assistant Q&A (E23) gives no answer for Hindi/Tamil.** English questions return good grounded answers; the same questions in **hi-IN / ta-IN** come back as "no relevant info / please contact supervisor". The app sends `question` + `lang` correctly (verified). This looks like the RAG **translate → retrieve → answer** path (DECISIONS #17): please confirm hi/ta questions are translated to English before embedding/retrieval and the answer is generated back in the operator's language. Repro: log in as Ravi (Tamil) → assistant → ask "How do I switch to power mode?".
+2. ⬜ **Training text not localized (E26).** `GET /operators/{id}/training/next` — the app now sends `machine_type` **and** `Accept-Language`, but the module `title` / `steps[].content` / `quiz` come back in **English** (only the narrated **video** seems per-language). Please localize E26 text by `?lang` / `Accept-Language` (like the checklist/seed i18n in #21), or confirm English text + localized video is intended.
+3. ⬜ **Training video URL format.** For `kind: "video"` steps, confirm `url` is **absolute** or **relative to the API base** — the app prefixes `API_BASE` for relative URLs. If videos are served from a different host/path, tell me so in-app playback resolves.
+
+**FYI — no action needed:** the **session 409** (`SESSION_ALREADY_ACTIVE` / `MACHINE_IN_USE`) is now handled **client-side** — the app reads `error.session_id` and *resumes* the existing session, so a demo can move in and out of a session freely without ending it. If you'd prefer the backend to auto-supersede an old active session instead, that's an optional alternative (not required).
+
+_Closed earlier: v2.1 re-split OK (DECISIONS #14); gitignore for `estimator.json` / `chroma/`._
 
 ## Session log
 | When | Did | Next |
