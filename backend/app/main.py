@@ -1,6 +1,7 @@
 """ReBase backend. Run: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"""
 
 import asyncio
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -26,8 +27,23 @@ from app.schemas import Health
 from app.simulator.engine import engine as simulator
 
 
+def _setup_logging() -> None:
+    """Show our own `app.*` log lines in the uvicorn console (they were silently dropped)."""
+    log = logging.getLogger("app")
+    if not log.handlers:
+        h = logging.StreamHandler()
+        h.setFormatter(logging.Formatter("%(levelname)s:     [%(name)s] %(message)s"))
+        log.addHandler(h)
+        log.setLevel(logging.INFO)
+        log.propagate = False
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    _setup_logging()
+    from app.ai import llm
+
+    logging.getLogger("app.main").info(llm.status())
     create_db()
     _seed_if_empty()
     _train_estimator_if_missing()

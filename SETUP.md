@@ -190,7 +190,7 @@ curl -X POST localhost:8000/voice/tts -H "Content-Type: application/json" \
 ### 5.4 Common errors  [Owner: B]
 | Error | Fix |
 |---|---|
-| Assistant/briefing answers in English or say "not in the manual" for Hindi/Tamil questions | No LLM reachable (no `LLM_API_KEY`, or Gemini free tier overloaded) — the assistant then reads the English manual section. Check the key; retry later |
+| Hindi/Tamil questions get "language service unavailable" (or English answers / template briefing) | The server can't reach an LLM. Look at the **first lines of the server console**: `LLM: gemini ✓ key set → groq ✓ key set` is good; `✗ NO KEY` means that server's `.env` has no `LLM_API_KEY`/`GROQ_API_KEY` — add them and restart. Each fallback also logs a `[app.ai.assistant]` line saying why. Make sure the app's `API_BASE` points at the server that has the keys |
 | _(fill in as you hit them)_ | |
 
 ## 6. Run the full stack  [Owner: both]

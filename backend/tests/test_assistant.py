@@ -109,11 +109,15 @@ def test_no_llm_reads_the_manual_in_english(client, llm):
     assert r["sources"] == [{"doc": "excavator_manual.md", "section": "4.2 Operating modes"}]
 
 
-def test_no_llm_tamil_question_cannot_be_matched(client, llm):
-    """Without translation the English index can't match Tamil → honest 'not found'."""
+def test_no_llm_tamil_question_says_language_service_is_down(client, llm):
+    """Without the LLM a Tamil question can't be translated. Say so honestly — don't
+    claim the manual doesn't cover it (that misled a user testing in Hindi)."""
     llm(fail=True)
     r = ask(client, Q_TA, lang="ta-IN").json()
     assert r["sources"] == [] and r["lang"] == "ta-IN"
+    assert r["answer"] == assistant.NO_TRANSLATION["ta-IN"]
+    r = ask(client, "पावर मोड में कैसे बदलें?", lang="hi-IN").json()
+    assert r["answer"] == assistant.NO_TRANSLATION["hi-IN"] and "मैनुअल" not in r["answer"]
 
 
 def test_default_config_has_no_llm(client):

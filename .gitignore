@@ -14,3 +14,4 @@ app/.packages
 backend/data/models/*.joblib
 backend/data/models/estimator.json
 backend/data/models/chroma/
+backend/data/media/
