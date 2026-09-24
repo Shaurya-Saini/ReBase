@@ -15,5 +15,11 @@ scikit-learn>=1.5
 chromadb>=0.5
 sentence-transformers>=3.0
 
+# Video lessons (prototype: python -m app.ai.video_lesson)
+pillow>=12.0            # slide layout
+imageio-ffmpeg>=0.6     # bundled ffmpeg (libass + HarfBuzz for Tamil/Hindi text)
+edge-tts>=7.2           # neural narration voices (unofficial free MS Edge TTS)
+gTTS>=2.5               # narration fallback (unofficial free Google Translate TTS)
+
 # Tests
 pytest>=8.0

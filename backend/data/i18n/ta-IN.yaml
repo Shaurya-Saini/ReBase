@@ -1,0 +1,110 @@
+# Tamil display text for seeded data + checklist content (hand-written; native review welcome).
+# Keys: entity ids, or the exact English text for checklist items/sections. IDs/enums are never translated.
+
+operators:
+  op_001: {name: "ரவி குமார்"}
+  op_002: {name: "பிரியா சர்மா"}
+  op_003: {name: "அர்ஜுன் முருகன்"}
+  op_004: {name: "மோஹித் வர்மா"}
+  op_005: {name: "சாம் டிசோசா"}
+
+machines:
+  mc_001: {model: "பொது 20 டன் எக்ஸ்கவேட்டர்"}
+  mc_002: {model: "பொது 3.5 m³ வீல் லோடர்"}
+  mc_003: {model: "பொது கிராலர் டிரில் ரிக்"}
+  mc_004: {model: "பொது 40 டன் ஆர்டிகுலேட்டட் டம்ப் டிரக்"}
+
+jobs:
+  job_001:
+    title: "அகழி தோண்டுதல் – பிளாக் C"
+    site: "தளம் 2, நார்த் பிட்"
+    hazards: ["கிழக்கு ஓரத்தின் அருகே மேல்நிலை மின் கம்பி", "மழைக்குப் பின் மென்மையான தரை"]
+  job_002:
+    title: "குவியல் ஏற்றுதல் – பே 3"
+    site: "தளம் 2, நார்த் பிட்"
+    hazards: ["பே 3 வெளியேறும் இடத்தில் பரபரப்பான ஹால் சாலை சந்திப்பு"]
+  job_003:
+    title: "வெடிதுளை துளையிடுதல் – பெஞ்ச் 5"
+    site: "தளம் 2, நார்த் பிட்"
+    hazards: ["பெஞ்ச் ஓரம் 5 m-க்குள்", "அதிக தூசி — கேபினை மூடி வைக்கவும்"]
+  job_004:
+    title: "மேல் மண் கொண்டு செல்லுதல் – டம்ப் B-க்கு"
+    site: "தளம் 2, நார்த் பிட்"
+    hazards: ["இரவு கொண்டு செல்லுதல் — ரேம்ப் 2-ல் குறைந்த தெரிவு"]
+  job_005:
+    title: "வடிகால் கால்வாய் – Ch. 4+200 முதல் 4+450 வரை"
+    site: "NH-44 வெட்டு, பிரிவு 4"
+    hazards: ["பணிப் பகுதியிலிருந்து 8 m தூரத்தில் இயங்கும் போக்குவரத்து"]
+  job_006:
+    title: "அடித்தள மண் ஏற்றுதல் – Ch. 4+500"
+    site: "NH-44 வெட்டு, பிரிவு 4"
+    hazards: ["சாலை முழுவதும் காற்றில் பறக்கும் தூசி"]
+  job_007:
+    title: "பாறை வெட்டு துளையிடுதல் – Ch. 4+800"
+    site: "NH-44 வெட்டு, பிரிவு 4"
+    hazards: ["மேல் பரப்பில் தளர்வான பாறை"]
+  job_008:
+    title: "கழிவு மண் கொண்டு செல்லுதல் – அகற்றும் முற்றத்திற்கு"
+    site: "NH-44 வெட்டு, பிரிவு 4"
+    hazards: ["ஈரமாக இருக்கும்போது வழுக்கும் மண் சாலை"]
+
+checklist_sections:
+  "Walk-around": "சுற்றிப் பார்த்தல்"
+  "Fluids": "திரவங்கள்"
+  "Cab and controls": "கேபின் மற்றும் கட்டுப்பாடுகள்"
+  "Safety devices": "பாதுகாப்பு சாதனங்கள்"
+
+checklist_items:
+  "Check tracks and undercarriage for damage": "டிராக் மற்றும் அடிச்சட்டத்தில் சேதம் உள்ளதா சரிபார்க்கவும்"
+  "Check hydraulic hoses for leaks": "ஹைட்ராலிக் குழாய்களில் கசிவு உள்ளதா சரிபார்க்கவும்"
+  "Check boom, arm and bucket pins and bushings for wear or missing retainers": "பூம், ஆர்ம், பக்கெட் பின்கள் மற்றும் புஷிங்குகளில் தேய்மானம் அல்லது காணாமல் போன ரிடெய்னர்கள் உள்ளனவா சரிபார்க்கவும்"
+  "Check bucket teeth and cutting edge": "பக்கெட் பற்கள் மற்றும் வெட்டு விளிம்பை சரிபார்க்கவும்"
+  "Check for cracks or damage on boom, arm and counterweight": "பூம், ஆர்ம் மற்றும் எதிர் எடையில் விரிசல் அல்லது சேதம் உள்ளதா சரிபார்க்கவும்"
+  "Check engine oil level": "இன்ஜின் எண்ணெய் அளவை சரிபார்க்கவும்"
+  "Check hydraulic oil level": "ஹைட்ராலிக் எண்ணெய் அளவை சரிபார்க்கவும்"
+  "Check coolant level": "குளிரூட்டி அளவை சரிபார்க்கவும்"
+  "Look under the machine for fresh fuel, oil or coolant leaks": "இயந்திரத்தின் கீழே புதிய எரிபொருள், எண்ணெய் அல்லது குளிரூட்டி கசிவு உள்ளதா பாருங்கள்"
+  "Seatbelt latches and is not frayed": "சீட் பெல்ட் சரியாகப் பூட்டுகிறது, நைந்து போகவில்லை"
+  "Swing and travel brakes hold": "ஸ்விங் மற்றும் பயண பிரேக்குகள் சரியாகப் பிடிக்கின்றன"
+  "Joysticks return to neutral; hydraulic lock lever works": "ஜாய்ஸ்டிக்குகள் நியூட்ரலுக்குத் திரும்புகின்றன; ஹைட்ராலிக் லாக் லீவர் வேலை செய்கிறது"
+  "Windows and mirrors clean and undamaged": "ஜன்னல்களும் கண்ணாடிகளும் சுத்தமாகவும் சேதமின்றியும் உள்ளன"
+  "Horn works": "ஹார்ன் வேலை செய்கிறது"
+  "Travel alarm sounds": "பயண அலாரம் ஒலிக்கிறது"
+  "Work lights work": "வேலை விளக்குகள் எரிகின்றன"
+  "Fire extinguisher present and charged": "தீயணைப்பான் உள்ளது, நிரப்பப்பட்டுள்ளது"
+  "Access steps and handrails secure": "ஏறும் படிகளும் கைப்பிடிகளும் உறுதியாக உள்ளன"
+  "Check tyres for cuts, bulges and correct inflation": "டயர்களில் வெட்டு, வீக்கம் மற்றும் சரியான காற்றழுத்தத்தை சரிபார்க்கவும்"
+  "Check hydraulic hoses and cylinders for leaks": "ஹைட்ராலிக் குழாய்கள் மற்றும் சிலிண்டர்களில் கசிவு உள்ளதா சரிபார்க்கவும்"
+  "Check lift arm and bucket pins for wear or missing retainers": "லிஃப்ட் ஆர்ம் மற்றும் பக்கெட் பின்களில் தேய்மானம் அல்லது காணாமல் போன ரிடெய்னர்கள் உள்ளனவா சரிபார்க்கவும்"
+  "Check bucket cutting edge and teeth": "பக்கெட் வெட்டு விளிம்பு மற்றும் பற்களை சரிபார்க்கவும்"
+  "Articulation lock pin removed and stowed": "ஆர்டிகுலேஷன் லாக் பின் அகற்றப்பட்டு உரிய இடத்தில் வைக்கப்பட்டுள்ளது"
+  "Check hydraulic and transmission oil levels": "ஹைட்ராலிக் மற்றும் டிரான்ஸ்மிஷன் எண்ணெய் அளவுகளை சரிபார்க்கவும்"
+  "Service and parking brakes hold": "சர்வீஸ் மற்றும் பார்க்கிங் பிரேக்குகள் சரியாகப் பிடிக்கின்றன"
+  "Steering responds smoothly in both directions": "ஸ்டீயரிங் இரு திசைகளிலும் சீராக இயங்குகிறது"
+  "Reverse alarm sounds": "ரிவர்ஸ் அலாரம் ஒலிக்கிறது"
+  "Head, tail and work lights work": "முன், பின் மற்றும் வேலை விளக்குகள் எரிகின்றன"
+  "Check hydraulic hoses on feed and boom for leaks": "ஃபீட் மற்றும் பூமில் உள்ள ஹைட்ராலிக் குழாய்களில் கசிவு உள்ளதா சரிபார்க்கவும்"
+  "Check mast, feed beam and centralizer for cracks or loose bolts": "மாஸ்ட், ஃபீட் பீம் மற்றும் சென்ட்ரலைசரில் விரிசல் அல்லது தளர்வான போல்ட்கள் உள்ளனவா சரிபார்க்கவும்"
+  "Check drill rods, bit and shank adapter for wear": "டிரில் ராடுகள், பிட் மற்றும் ஷாங்க் அடாப்டரில் தேய்மானத்தை சரிபார்க்கவும்"
+  "Check dust collector and hoses are intact": "தூசி சேகரிப்பான் மற்றும் குழாய்கள் சேதமின்றி உள்ளனவா சரிபார்க்கவும்"
+  "Check engine and compressor oil levels": "இன்ஜின் மற்றும் கம்ப்ரசர் எண்ணெய் அளவுகளை சரிபார்க்கவும்"
+  "Tramming brakes hold": "டிராமிங் பிரேக்குகள் சரியாகப் பிடிக்கின்றன"
+  "Rotation and feed controls return to neutral": "ரொட்டேஷன் மற்றும் ஃபீட் கட்டுப்பாடுகள் நியூட்ரலுக்குத் திரும்புகின்றன"
+  "Emergency stop buttons work (cab and drill deck)": "அவசர நிறுத்த பொத்தான்கள் வேலை செய்கின்றன (கேபின் மற்றும் டிரில் டெக்)"
+  "Rotation guard / rod-handling guard in place": "ரொட்டேஷன் கார்டு / ராட் கையாளும் கார்டு பொருத்தப்பட்டுள்ளது"
+  "Horn and travel alarm work": "ஹார்ன் மற்றும் பயண அலாரம் வேலை செய்கின்றன"
+  "Check wheel nuts are tight and none missing": "வீல் நட்டுகள் இறுக்கமாக உள்ளனவா, எதுவும் காணாமல் போகவில்லையா சரிபார்க்கவும்"
+  "Check body hoist cylinders and hoses for leaks": "பாடி ஹாய்ஸ்ட் சிலிண்டர்கள் மற்றும் குழாய்களில் கசிவு உள்ளதா சரிபார்க்கவும்"
+  "Check tailgate and body pins": "டெயில்கேட் மற்றும் பாடி பின்களை சரிபார்க்கவும்"
+  "Articulation lock removed and stowed": "ஆர்டிகுலேஷன் லாக் அகற்றப்பட்டு உரிய இடத்தில் வைக்கப்பட்டுள்ளது"
+  "Check transmission and hydraulic oil levels": "டிரான்ஸ்மிஷன் மற்றும் ஹைட்ராலிக் எண்ணெய் அளவுகளை சரிபார்க்கவும்"
+  "Service, parking and retarder brakes work": "சர்வீஸ், பார்க்கிங் மற்றும் ரிடார்டர் பிரேக்குகள் வேலை செய்கின்றன"
+  "Mirrors and camera screen clean and adjusted": "கண்ணாடிகளும் கேமரா திரையும் சுத்தமாகவும் சரியாக அமைக்கப்பட்டும் உள்ளன"
+  "Head, brake and indicator lights work": "முன் விளக்கு, பிரேக் மற்றும் இண்டிகேட்டர் விளக்குகள் எரிகின்றன"
+  "Body-up warning light works": "பாடி-அப் எச்சரிக்கை விளக்கு வேலை செய்கிறது"
+
+terms:
+  machine_types: {excavator: "எக்ஸ்கவேட்டர்", wheel_loader: "வீல் லோடர்", drill_rig: "டிரில் ரிக்", dump_truck: "டம்ப் டிரக்"}
+  levels: {novice: "புதியவர்", intermediate: "இடைநிலை அனுபவம்", expert: "நிபுணர்"}
+  weather_notes: {clear: "தெளிவான வானிலை", rain: "மழை முன்னறிவிப்பு", heat: "அதிக வெப்ப முன்னறிவிப்பு", wind: "பலத்த காற்று முன்னறிவிப்பு"}
+  experience_note: "{machine} இயக்குவதில் {level}"

@@ -29,6 +29,17 @@ NOT_FOUND = {
     "ta-IN": "இதை {machine} கையேட்டில் கண்டுபிடிக்க முடியவில்லை. உங்கள் மேற்பார்வையாளரிடம் கேளுங்கள்.",
 }
 
+# The question isn't English and the LLM (which translates it) is unreachable:
+# say that honestly instead of claiming the manual doesn't cover it.
+NO_TRANSLATION = {
+    "en-IN": "I can't understand questions in this language right now because the language service "
+             "is unavailable. Please ask in English, or try again in a moment.",
+    "hi-IN": "भाषा सेवा अभी उपलब्ध नहीं है, इसलिए मैं अभी हिंदी में सवाल नहीं समझ पा रहा हूँ। "
+             "कृपया अंग्रेज़ी में पूछें या थोड़ी देर बाद फिर कोशिश करें।",
+    "ta-IN": "மொழி சேவை இப்போது கிடைக்கவில்லை, அதனால் தமிழில் கேள்விகளை இப்போது புரிந்துகொள்ள முடியவில்லை. "
+             "ஆங்கிலத்தில் கேளுங்கள் அல்லது சிறிது நேரம் கழித்து மீண்டும் முயற்சிக்கவும்.",
+}
+
 TRANSLATE_SCHEMA = {
     "type": "object",
     "properties": {"english": {"type": "string"}},
@@ -91,11 +102,15 @@ def ask(question: str, machine_type: str, lang: str) -> dict:
     try:
         english = _english(question, lang)
     except LLMUnavailable as e:
-        log.info("assistant: translation unavailable (%s)", e)
+        log.warning("assistant: can't translate %s question — LLM unavailable (%s)", lang, e)
         english, llm_ok = question, False
+        if not question.isascii():
+            return {"answer": NO_TRANSLATION.get(lang, NO_TRANSLATION["en-IN"]),
+                    "lang": lang if lang in NO_TRANSLATION else "en-IN", "sources": []}
 
     hits = rag.relevant(rag.retrieve(english, machine_type, k=TOP_K))
     if not hits:
+        log.info("assistant: nothing relevant in the %s manual for %r", machine_type, english)
         return {"answer": NOT_FOUND.get(lang, NOT_FOUND["en-IN"]).format(machine=machine),
                 "lang": lang if lang in NOT_FOUND else "en-IN", "sources": []}
 
@@ -119,7 +134,7 @@ def ask(question: str, machine_type: str, lang: str) -> dict:
                 return {"answer": out["answer"], "lang": lang,
                         "sources": [_source(h) for h in (used or hits[:1])]}
         except LLMUnavailable as e:
-            log.info("assistant: answer LLM unavailable (%s)", e)
+            log.warning("assistant: answer LLM unavailable, reading the manual instead (%s)", e)
 
     # No LLM: read out the best manual section (English).
     top = hits[0]

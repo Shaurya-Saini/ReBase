@@ -35,6 +35,18 @@ class LLMUnavailable(Exception):
     pass
 
 
+def status() -> str:
+    """One line for the startup log: which LLMs this server can use."""
+    primary = settings.LLM_PROVIDER
+    has_key = {"gemini": bool(settings.LLM_API_KEY), "anthropic": True,  # SDK may find its own credentials
+               "groq": bool(settings.GROQ_API_KEY or (primary == "groq" and settings.LLM_API_KEY))}
+    parts = [f"{p} {'✓ key set' if has_key.get(p) else '✗ NO KEY'}" for p in _providers()]
+    if not any(has_key.get(p) for p in _providers()):
+        return ("LLM: " + " → ".join(parts) + " — briefing uses templates; Hindi/Tamil questions "
+                "can't be translated (set LLM_API_KEY / GROQ_API_KEY in .env and restart)")
+    return "LLM: " + " → ".join(parts)
+
+
 def _providers() -> list[str]:
     """Primary provider, then Groq as fallback when a Groq key is configured."""
     chain = [settings.LLM_PROVIDER]

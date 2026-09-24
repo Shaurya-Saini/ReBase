@@ -15,6 +15,7 @@ from app import models
 from app.ai.checklists import checklist_items, load_checklist
 from app.clock import now_utc
 from app.errors import ApiError
+from app.i18n import DEFAULT, tr
 from app.ids import next_id
 from app.services.fatigue import operator_fatigue
 from app.simulator.engine import engine as sim
@@ -88,25 +89,28 @@ def _states(db: Session, session_id: str) -> dict[str, models.ChecklistItemState
     return {r.item_id: r for r in rows}
 
 
-def checklist(db: Session, s: models.WorkSession) -> dict:
+def checklist(db: Session, s: models.WorkSession, lang: str = DEFAULT) -> dict:
     mtype = _machine_type(db, s)
     content = load_checklist(mtype)
     states = _states(db, s.id)
 
     def item(i: dict) -> dict:
         st = states.get(i["id"])
-        return {**i, "status": st.status if st else "pending", "note": st.note if st else None}
+        return {**i, "text": tr(lang, "checklist_items", i["text"], i["text"]),
+                "status": st.status if st else "pending", "note": st.note if st else None}
 
     return {
         "session_id": s.id,
         "machine_type": mtype,
         "standard_refs": content["standard_refs"],
-        "sections": [{"title": sec["title"], "items": [item(i) for i in sec["items"]]}
+        "sections": [{"title": tr(lang, "checklist_sections", sec["title"], sec["title"]),
+                      "items": [item(i) for i in sec["items"]]}
                      for sec in content["sections"]],
     }
 
 
-def update_item(db: Session, s: models.WorkSession, item_id: str, status: str, note: str | None) -> dict:
+def update_item(db: Session, s: models.WorkSession, item_id: str, status: str, note: str | None,
+                lang: str = DEFAULT) -> dict:
     _require_state(s, "pre_start")
     items = checklist_items(_machine_type(db, s))
     if item_id not in items:
@@ -116,7 +120,8 @@ def update_item(db: Session, s: models.WorkSession, item_id: str, status: str, n
     row.status, row.note, row.updated_at = status, note, now_utc()
     db.add(row)
     db.commit()
-    return {**items[item_id], "status": status, "note": note}
+    item = items[item_id]
+    return {**item, "text": tr(lang, "checklist_items", item["text"], item["text"]), "status": status, "note": note}
 
 
 def complete_checklist(db: Session, s: models.WorkSession) -> models.WorkSession:

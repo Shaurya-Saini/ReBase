@@ -10,6 +10,7 @@ from app import models
 from app.clock import today_ist
 from app.db import get_db
 from app.errors import ApiError
+from app.i18n import display_lang
 from app.ids import next_id
 from app.schemas import Assignment, AssignmentCreate
 from app.views import assignment_out, get_or_404
@@ -25,6 +26,7 @@ def list_assignments(
     operator_id: str,
     range: Literal["day", "week", "month"] = "day",
     db: Session = Depends(get_db),
+    lang: str = Depends(display_lang),
 ):
     get_or_404(db, models.Operator, operator_id)
     start = today_ist()
@@ -35,11 +37,12 @@ def list_assignments(
         .where(models.Assignment.date >= start, models.Assignment.date < end)
         .order_by(models.Assignment.date, models.Assignment.shift)  # "day" < "night"
     ).all()
-    return [assignment_out(db, a) for a in rows]
+    return [assignment_out(db, a, lang) for a in rows]
 
 
 @router.post("/assignments", response_model=Assignment, status_code=201)
-def create_assignment(body: AssignmentCreate, db: Session = Depends(get_db)):
+def create_assignment(body: AssignmentCreate, db: Session = Depends(get_db),
+                      lang: str = Depends(display_lang)):
     get_or_404(db, models.Operator, body.operator_id)
     job = get_or_404(db, models.Job, body.job_id)
     machine = get_or_404(db, models.Machine, body.machine_id)
@@ -72,4 +75,4 @@ def create_assignment(body: AssignmentCreate, db: Session = Depends(get_db)):
     db.add(a)
     db.commit()
     db.refresh(a)
-    return assignment_out(db, a)
+    return assignment_out(db, a, lang)

@@ -17,6 +17,7 @@ backend/
 │   ├── seed.py                `python -m app.seed` → wipe + refill DB (incl. ~60 JobLog rows)
 │   ├── schemas.py             API request/response shapes = CONTRACT §2 enums + §4 schemas
 │   ├── errors.py              ApiError + handlers → {"error": {"code", "message"}} (§1)
+│   ├── i18n.py                display text in hi/ta from data/i18n (?lang= / Accept-Language, CONTRACT v2.2)
 │   ├── routers/               operators (incl. /auth/login), machines, jobs, assignments, sessions,
 │   │                          checklist, alerts, training, sim, ws   (assistant + voice live in ai/)
 │   ├── services/
@@ -29,6 +30,8 @@ backend/
 ├── data/checklists/           <machine_type>.yaml  (structured checklist content, served by E12)
 ├── data/manuals/              <machine_type>_manual.md  (embedded in the vector DB for Q&A)
 ├── data/training/             <machine_type>_<level>.yaml
+├── data/i18n/                 hi-IN.yaml, ta-IN.yaml — translations of seeded + checklist display text
+├── data/fonts/                Noto Sans (Latin/Tamil/Devanagari, SIL OFL) for video lessons
 ├── data/models/               estimator.json (XGBoost) + chroma/ store  (gitignored)
 └── tests/                     pytest + TestClient, one file per router/service
 ```

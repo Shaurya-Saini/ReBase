@@ -5,6 +5,7 @@ from typing import TypeVar
 from sqlmodel import Session, SQLModel
 
 from app import models, schemas
+from app.i18n import DEFAULT, tr_entity
 from app.errors import ApiError
 from app.services.fatigue import operator_fatigue
 
@@ -28,11 +29,11 @@ def get_or_404(db: Session, model: type[T], id_: str) -> T:
     return row
 
 
-def operator_out(db: Session, op: models.Operator) -> schemas.Operator:
+def operator_out(db: Session, op: models.Operator, lang: str = DEFAULT) -> schemas.Operator:
     f = operator_fatigue(db, op)
     return schemas.Operator(
         id=op.id,
-        name=op.name,
+        name=tr_entity(lang, "operators", op.id, "name", op.name),
         lang=op.lang,
         experience=op.experience,
         hours_today=round(f.hours_today, 1),
@@ -41,12 +42,25 @@ def operator_out(db: Session, op: models.Operator) -> schemas.Operator:
     )
 
 
-def assignment_out(db: Session, a: models.Assignment) -> schemas.Assignment:
+def job_out(job: models.Job, lang: str = DEFAULT) -> schemas.Job:
+    out = schemas.Job.model_validate(job)
+    out.title = tr_entity(lang, "jobs", job.id, "title", job.title)
+    out.site = tr_entity(lang, "jobs", job.id, "site", job.site)
+    return out
+
+
+def machine_out(machine: models.Machine, lang: str = DEFAULT) -> schemas.Machine:
+    out = schemas.Machine.model_validate(machine)
+    out.model = tr_entity(lang, "machines", machine.id, "model", machine.model)
+    return out
+
+
+def assignment_out(db: Session, a: models.Assignment, lang: str = DEFAULT) -> schemas.Assignment:
     return schemas.Assignment(
         id=a.id,
         operator_id=a.operator_id,
         date=a.date,
         shift=a.shift,
-        job=schemas.Job.model_validate(get_or_404(db, models.Job, a.job_id)),
-        machine=schemas.Machine.model_validate(get_or_404(db, models.Machine, a.machine_id)),
+        job=job_out(get_or_404(db, models.Job, a.job_id), lang),
+        machine=machine_out(get_or_404(db, models.Machine, a.machine_id), lang),
     )
