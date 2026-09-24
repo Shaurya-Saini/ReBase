@@ -3,13 +3,43 @@ machine_type: wheel_loader
 level: intermediate
 title: Efficient loading with the wheel loader
 duration_min: 35
+topics:
+- loading
+- modes
+- overload
 steps:
-  - {kind: text, content: "This recap covers stockpile loading, loading trucks and the drive modes."}
-  - {kind: text, content: "Approach the pile straight with the bucket flat. Drive in in low gear, then curl back while raising the arms slowly. Don't spin the wheels: it wears the tyres fast."}
-  - {kind: text, content: "Loading trucks: approach at a right angle, raise the bucket only when close and moving slowly, and dump gently in the centre. Never load over the cab with the driver inside."}
-  - {kind: text, content: "Power mode for hard digging and ramps, economy mode for normal loading. Switch with the machine stopped or in neutral."}
-  - {kind: tip, content: "The load indicator warns above 90 percent of rated load; above 100 percent you are overloaded. Dump part of the load."}
+- kind: text
+  content: This recap covers stockpile loading, loading trucks and the drive modes.
+- kind: text
+  content: 'Approach the pile straight with the bucket flat. Drive in in low gear, then curl back while raising the arms slowly. Don''t spin the wheels: it wears the tyres fast.'
+- kind: text
+  content: 'Loading trucks: approach at a right angle, raise the bucket only when close and moving slowly, and dump gently in the centre. Never load over the cab with the driver inside.'
+- kind: text
+  content: Power mode for hard digging and ramps, economy mode for normal loading. Switch with the machine stopped or in neutral.
+- kind: tip
+  content: The load indicator warns above 90 percent of rated load; above 100 percent you are overloaded. Dump part of the load.
 quiz:
-  - {q: "How do you enter a stockpile?", options: ["Fast, with the bucket raised", "Straight, bucket flat, low gear", "At an angle, spinning the wheels"], answer_index: 1}
-  - {q: "The load indicator shows 104 percent. What do you do?", options: ["Carry on", "Dump part of the load", "Switch to power mode"], answer_index: 1}
-  - {q: "May you load over the truck cab with the driver inside?", options: ["Yes, if careful", "No, never", "Only in economy mode"], answer_index: 1}
+- q: How do you enter a stockpile?
+  options:
+  - Fast, with the bucket raised
+  - Straight, bucket flat, low gear
+  - At an angle, spinning the wheels
+  answer_index: 1
+  explanation: Approach straight with the bucket flat and drive in in low gear.
+  source: 4.1 Loading from a stockpile
+- q: The load indicator shows 104 percent. What do you do?
+  options:
+  - Carry on
+  - Dump part of the load
+  - Switch to power mode
+  answer_index: 1
+  explanation: 'Above 100 percent the loader is overloaded: dump part of the load.'
+  source: 5.3 Overload
+- q: May you load over the truck cab with the driver inside?
+  options:
+  - Yes, if careful
+  - No, never
+  - Only in economy mode
+  answer_index: 1
+  explanation: Never load over the truck cab while the driver is inside.
+  source: 4.4 Loading trucks

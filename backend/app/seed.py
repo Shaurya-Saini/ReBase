@@ -30,12 +30,14 @@ from sqlmodel import Session, SQLModel
 from app.clock import IST
 from app.db import engine
 from app.models import (
+    Alert,
     Assignment,
     Job,
     JobLog,
     Machine,
     Operator,
     Project,
+    TrainingCompletion,
     WorkSession,
 )
 
@@ -185,6 +187,30 @@ def _job_logs(rng: random.Random, today: date) -> list[JobLog]:
     return logs
 
 
+def _demo_alerts(history: list[WorkSession], now: datetime) -> list[Alert]:
+    """Ravi's last week, so the Training Hub plan has real alerts to react to:
+    2× seatbelt + 1× proximity on the excavator (ids alr_hNNN never clash with new alr_NNN)."""
+    ravi = sorted((s for s in history if s.operator_id == "op_001" and s.ended_at < now - timedelta(hours=12)),
+                  key=lambda s: s.started_at, reverse=True)
+    day2, day3 = ravi[0], ravi[1]
+    spec = [(day2, 2.0, "seatbelt_off", "telemetry", "warning", "Seatbelt not fastened"),
+            (day3, 1.0, "seatbelt_off", "telemetry", "critical", "Seatbelt not fastened while machine is moving"),
+            (day2, 3.5, "proximity", "telemetry", "warning", "Person or obstacle within 4.2 m")]
+    return [Alert(id=f"alr_h{i:03d}", session_id=s.id, type=t, source=src, severity=sev, message=msg,
+                  ts=s.started_at + timedelta(hours=h), acknowledged=True)
+            for i, (s, h, t, src, sev, msg) in enumerate(spec, start=1)]
+
+
+def _demo_training(today: date) -> list[TrainingCompletion]:
+    """Quiz history: Ravi failed the intermediate module 3 days ago (→ retake), passed novice + expert
+    since (→ 3-day streak); Priya passed her module yesterday."""
+    before_shift = lambda days_ago: shift_start(today - timedelta(days=days_ago), "day") - timedelta(hours=1)  # noqa: E731
+    spec = [("op_001", "trn_ex_intermediate_01", 2, 3), ("op_001", "trn_ex_novice_01", 4, 2),
+            ("op_001", "trn_ex_expert_01", 3, 1), ("op_002", "trn_wl_expert_01", 3, 1)]
+    return [TrainingCompletion(operator_id=op, module_id=mid, score=score, completed_at=before_shift(d))
+            for op, mid, score, d in spec]
+
+
 def seed(db_engine=engine, now: datetime | None = None, rng_seed: int = 42) -> None:
     """Drop every table, recreate, and fill with the demo data."""
     now_aware = now or datetime.now(timezone.utc)
@@ -231,12 +257,20 @@ def seed(db_engine=engine, now: datetime | None = None, rng_seed: int = 42) -> N
             ))
 
         primary_machine = {op_id: MACHINE_BY_TYPE[next(iter(exp))] for op_id, _, _, exp in OPERATORS}
+        history = []
         for i, (op_id, start, end) in enumerate(_work_history(now_utc, today), start=1):
-            db.add(WorkSession(
+            ses = WorkSession(
                 id=f"ses_h{i:03d}", operator_id=op_id, machine_id=primary_machine[op_id],
                 job_id="job_001",  # history only; the job link isn't used for fatigue
                 state="ended", created_at=start, started_at=start, ended_at=end,
-            ))
+            )
+            history.append(ses)
+            db.add(ses)
+
+        for a in _demo_alerts(history, now_utc):
+            db.add(a)
+        for c in _demo_training(today):
+            db.add(c)
 
         for log in _job_logs(rng, today):
             db.add(log)

@@ -3,17 +3,61 @@ machine_type: excavator
 level: novice
 title: Excavator basics before your shift
 duration_min: 45
+topics:
+- controls
+- startup
+- seatbelt
+- proximity
+- power_lines
 steps:
-  - {kind: text, content: "Welcome. This recap covers the controls, starting up safely and the rules that keep you and the ground crew safe. Take your time: you can come back to any step."}
-  - {kind: text, content: "This machine uses the ISO joystick pattern. Left joystick: forward and back moves the arm out and in, left and right swings the machine. Right joystick: forward and back lowers and raises the boom, left and right curls and dumps the bucket."}
-  - {kind: tip, content: "Before you leave the seat or let anyone come near the machine, pull the hydraulic lock lever up. With it up, the joysticks do nothing."}
-  - {kind: text, content: "Starting up: finish the pre-start checklist on the tablet, fasten your seatbelt, check the lock lever is up, sound the horn, then start. Warm up for 5 minutes and work each function slowly a few times."}
-  - {kind: text, content: "Keep at least 10 m between the machine and the ground crew unless a signaller waves them in. The counterweight swings behind you: check the swing area before every swing."}
-  - {kind: tip, content: "Never swing the bucket over people or vehicles. If the proximity warning sounds, stop all movement."}
-  - {kind: text, content: "Power lines: keep every part of the machine, including the boom at full reach, at least 6 m away. If you are unsure of the voltage, treat the line as live."}
-  - {kind: text, content: "Practice task: sit in the cab with the engine off and the lock lever up. Name each joystick movement out loud before your first dig of the day."}
+- kind: text
+  content: 'Welcome. This recap covers the controls, starting up safely and the rules that keep you and the ground crew safe. Take your time: you can come back to any step.'
+- kind: text
+  content: 'This machine uses the ISO joystick pattern. Left joystick: forward and back moves the arm out and in, left and right swings the machine. Right joystick: forward and back lowers and raises the
+    boom, left and right curls and dumps the bucket.'
+- kind: tip
+  content: Before you leave the seat or let anyone come near the machine, pull the hydraulic lock lever up. With it up, the joysticks do nothing.
+- kind: text
+  content: 'Starting up: finish the pre-start checklist on the tablet, fasten your seatbelt, check the lock lever is up, sound the horn, then start. Warm up for 5 minutes and work each function slowly a
+    few times.'
+- kind: text
+  content: 'Keep at least 10 m between the machine and the ground crew unless a signaller waves them in. The counterweight swings behind you: check the swing area before every swing.'
+- kind: tip
+  content: Never swing the bucket over people or vehicles. If the proximity warning sounds, stop all movement.
+- kind: text
+  content: 'Power lines: keep every part of the machine, including the boom at full reach, at least 6 m away. If you are unsure of the voltage, treat the line as live.'
+- kind: text
+  content: 'Practice task: sit in the cab with the engine off and the lock lever up. Name each joystick movement out loud before your first dig of the day.'
 quiz:
-  - {q: "What must you do if a hydraulic hose leaks?", options: ["Ignore it", "Report and do not start", "Start slowly"], answer_index: 1}
-  - {q: "How close may the ground crew come without a signaller?", options: ["2 m", "5 m", "10 m"], answer_index: 2}
-  - {q: "What does the hydraulic lock lever do when it is up?", options: ["Locks all hydraulic functions", "Starts the engine", "Switches to power mode"], answer_index: 0}
-  - {q: "Minimum distance from overhead power lines?", options: ["2 m", "6 m", "15 m"], answer_index: 1}
+- q: What must you do if a hydraulic hose leaks?
+  options:
+  - Ignore it
+  - Report and do not start
+  - Start slowly
+  answer_index: 1
+  explanation: 'A leaking hydraulic hose is a critical defect: report it and do not start until it is fixed.'
+  source: 6.1 Walk-around inspection
+- q: How close may the ground crew come without a signaller?
+  options:
+  - 2 m
+  - 5 m
+  - 10 m
+  answer_index: 2
+  explanation: Keep at least 10 m from the ground crew unless a signaller waves them in.
+  source: 1.3 Ground crew and swing area
+- q: What does the hydraulic lock lever do when it is up?
+  options:
+  - Locks all hydraulic functions
+  - Starts the engine
+  - Switches to power mode
+  answer_index: 0
+  explanation: With the hydraulic lock lever up, the joysticks and travel levers do nothing.
+  source: 2.3 Hydraulic lock lever
+- q: Minimum distance from overhead power lines?
+  options:
+  - 2 m
+  - 6 m
+  - 15 m
+  answer_index: 1
+  explanation: Every part of the machine, including the boom at full reach, stays at least 6 m from power lines.
+  source: 1.2 Working near power lines

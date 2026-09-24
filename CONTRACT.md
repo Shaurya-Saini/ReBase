@@ -1,4 +1,4 @@
-# ReBase — API + Internal Contract (v2.2)
+# ReBase — API + Internal Contract (v2.3)
 
 Single source of truth between **Person A (Edge AI + UI)** and **Person B (Infra + Backend AI)**. Change only via the protocol in `CLAUDE.md` §6.
 A copies the JSON examples below into `app/assets/mock/` as mock fixtures. Since v2.1 the split is **A = the entire Flutter app, B = the entire backend**; the HTTP/WS contract (§3–§5) is the only interface between them. §6 lists the Flutter interfaces A builds.
@@ -81,7 +81,10 @@ A copies the JSON examples below into `app/assets/mock/` as mock fixtures. Since
 | E24 | POST | `/voice/tts` | `{text, lang}` → `audio/wav` bytes (Sarvam) | B | A app | M4 |
 | E25 | POST | `/translate` | `{text, target, source?}` → `{"text","lang"}` (Sarvam; optional) | B | A app | M4 |
 | E26 | GET | `/operators/{id}/training/next?machine_type=` | `TrainingModule` | B | A app | M4 |
-| E27 | POST | `/training/{module_id}/complete` | `{operator_id, score}` → `{"ok": true}` | B | A app | M4 |
+| E27 | POST | `/training/{module_id}/complete` | `{operator_id, score}` → `{"ok": true}` (score = number of correct answers) | B | A app | M4 |
+| E28 | GET | `/operators/{id}/training/plan?lang=` | `TrainingPlan` — today's personalized recap, ranked, with reasons (v2.3) | B | A app | M4 |
+| E29 | GET | `/training/modules/{module_id}?lang=` | `TrainingModule` in the display language (v2.3) | B | A app | M4 |
+| E30 | POST | `/training/{module_id}/submit?lang=` | `QuizSubmit` → `QuizResult` — server grades, explains, records (v2.3) | B | A app | M4 |
 
 **Removed in v2.0:** old `/voice/stt` — speech-to-text now runs **on-device (A)** via the `speech_to_text` plugin.
 
@@ -271,6 +274,33 @@ Error on complete (422):
 
 ---
 
+### TrainingPlan / QuizSubmit / QuizResult  (v2.3)
+`TrainingPlan` (E28). `reasons[].code` ∈ `assigned`, `job_hazard`, `recent_alert`, `new_machine`, `retake`, `level_up`, `keep_fresh`; `text` is localized and ready to show. `status` = `done` if passed today.
+```json
+{
+  "operator_id": "op_001", "date": "2026-09-24", "lang": "en-IN", "total_minutes": 110,
+  "items": [
+    {"module_id": "trn_ex_novice_01", "title": "Excavator basics before your shift", "machine_type": "excavator",
+     "level": "novice", "duration_min": 45, "priority": 1, "status": "todo",
+     "reasons": [{"code": "recent_alert", "text": "2 seatbelt alert(s) in the last 7 days"},
+                 {"code": "job_hazard", "text": "Hazard on your job: Overhead power line near east edge"}],
+     "last_result": {"score": 4, "total": 4, "at": "2026-09-22T02:30:00Z"}}
+  ],
+  "progress": {"attempts": 3, "modules_passed": 2, "avg_score_pct": 83, "streak_days": 3}
+}
+```
+`QuizSubmit` (E30): `{"operator_id": "op_001", "answers": [1, 2, 0, null]}` — chosen option index per question, `null` = skipped; wrong length → 422 `ANSWER_COUNT_MISMATCH`, bad index → 422 `ANSWER_OUT_OF_RANGE`.
+`QuizResult` (E30): passed = ≥ 70 % correct; explanations in the display language; recorded like E27.
+```json
+{"module_id": "trn_ex_novice_01", "score": 3, "total": 4, "passed": true,
+ "results": [{"index": 0, "chosen": 1, "correct_index": 1, "correct": true,
+              "explanation": "A leaking hydraulic hose is a critical defect: report it and do not start until it is fixed.",
+              "source": {"doc": "excavator_manual.md", "section": "6.1 Walk-around inspection"}}]}
+```
+`TrainingModule` (E26/E29) is unchanged — no explanations/sources before submitting. E26 also accepts `?lang=`.
+
+---
+
 ## 5. WebSocket `/ws/sessions/{id}`  (telemetry stream only in v2.0)
 
 Server → client, every 1 second while session is `active`. The simulator produces **machine sensors**; **operator state is no longer here** — it is decided on-device by the camera CV.
@@ -346,3 +376,4 @@ No cross-person imports — `backend/` is entirely B, `app/` is entirely A. A's 
 | v2.0 | M0 | A + B | Edge re-architecture. Safety detection → tablet (A): ML Kit camera CV + telemetry rules; app POSTs alerts (new E18). WS = telemetry only. Checklists + Q&A + briefing → backend RAG (B). Estimator → XGBoost (B). STT → on-device (A); removed `/voice/stt`. Sarvam = TTS + translate proxy (B). Backend now entirely B; §6 meets only in Flutter. Demo langs en/hi/ta; no local cache. Endpoints renumbered E1–E27. |
 | v2.1 | M0 | B (pending A OK) | Ownership only, no API change: **whole Flutter app → A** (project setup, pubspec, main.dart, `core/` data layer + mock/HTTP/WS clients, mock fixtures, Training Hub screens). B = whole backend, no Flutter. E26/E27 caller → A app. §6 reworded accordingly. |
 | v2.2 | M4 | B (additive) | Display language: optional `?lang=` / `Accept-Language` on E2–E9, E12, E13 returns hand-translated hi/ta display strings (names, models, job titles/sites, checklist text, estimate notes). No shape changes; default en-IN. |
+| v2.3 | M4 | B (additive) | Training Hub: E28 personalized plan (reasons from assignments, job hazards, recent alerts, past scores; progress + streak), E29 localized module, E30 server-graded quiz with explanations + manual source; `?lang=` on E26. E27 unchanged. |

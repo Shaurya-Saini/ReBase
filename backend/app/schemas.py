@@ -326,3 +326,66 @@ class TrainingCompleteRequest(Schema):
 
 class Ok(Schema):
     ok: bool
+
+
+# ---------- Training Hub v2.3 (plan, quiz grading) ----------
+
+class PlanReason(Schema):
+    code: str  # assigned | job_hazard | recent_alert | new_machine | retake | level_up | keep_fresh
+    text: str  # localized, ready to show
+
+
+class LastResult(Schema):
+    score: int
+    total: int
+    at: datetime
+
+
+class PlanItem(Schema):
+    module_id: str
+    title: str
+    machine_type: MachineType
+    level: Experience
+    duration_min: int
+    priority: int  # 1 = do first
+    status: str  # todo | done (passed today)
+    reasons: list[PlanReason]
+    last_result: LastResult | None = None
+
+
+class TrainingProgress(Schema):
+    attempts: int
+    modules_passed: int
+    avg_score_pct: int | None
+    streak_days: int
+
+
+class TrainingPlan(Schema):
+    operator_id: str
+    date: date
+    lang: Lang
+    total_minutes: int  # of the items still to do
+    items: list[PlanItem]
+    progress: TrainingProgress
+
+
+class QuizSubmit(Schema):
+    operator_id: str
+    answers: list[int | None]  # chosen option index per question, in order; null = skipped
+
+
+class QuestionResult(Schema):
+    index: int
+    chosen: int | None
+    correct_index: int
+    correct: bool
+    explanation: str
+    source: Source  # manual section the answer comes from
+
+
+class QuizResult(Schema):
+    module_id: str
+    score: int
+    total: int
+    passed: bool
+    results: list[QuestionResult]

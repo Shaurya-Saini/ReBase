@@ -3,16 +3,58 @@ machine_type: excavator
 level: intermediate
 title: Working efficiently and safely with the excavator
 duration_min: 35
+topics:
+- modes
+- digging
+- overheat
+- idle
+- slopes
 steps:
-  - {kind: text, content: "This recap is about working modes, digging technique and reading the machine's warnings."}
-  - {kind: text, content: "Working modes: Power (P) for heavy digging, Economy (E) to save fuel on normal work, Lifting (L) for slow precise lifts, Breaker (B) for a hydraulic breaker. Change mode with the M button on the monitor panel, with both joysticks in neutral."}
-  - {kind: tip, content: "Economy mode uses about 10 to 15 percent less fuel. Use power mode only when the job needs it."}
-  - {kind: text, content: "Dig with the arm pulling in towards the machine. Keep the tracks at right angles to the trench and never dig under the tracks. In soft ground keep the trench edge at least 1 m from the tracks."}
-  - {kind: text, content: "Hydraulic oil runs at 50 to 80 °C. Above 95 °C the warning comes on: reduce the load, switch to economy and let it idle. Above 105 °C stop work and report it."}
-  - {kind: tip, content: "Auto-idle saves fuel. If you will wait more than 5 minutes, stop the engine instead of idling."}
-  - {kind: text, content: "Slopes: never work on slopes steeper than 15 degrees, travel straight up or down, never across. After rain, check the ground before moving onto it."}
+- kind: text
+  content: This recap is about working modes, digging technique and reading the machine's warnings.
+- kind: text
+  content: 'Working modes: Power (P) for heavy digging, Economy (E) to save fuel on normal work, Lifting (L) for slow precise lifts, Breaker (B) for a hydraulic breaker. Change mode with the M button on
+    the monitor panel, with both joysticks in neutral.'
+- kind: tip
+  content: Economy mode uses about 10 to 15 percent less fuel. Use power mode only when the job needs it.
+- kind: text
+  content: Dig with the arm pulling in towards the machine. Keep the tracks at right angles to the trench and never dig under the tracks. In soft ground keep the trench edge at least 1 m from the tracks.
+- kind: text
+  content: 'Hydraulic oil runs at 50 to 80 °C. Above 95 °C the warning comes on: reduce the load, switch to economy and let it idle. Above 105 °C stop work and report it.'
+- kind: tip
+  content: Auto-idle saves fuel. If you will wait more than 5 minutes, stop the engine instead of idling.
+- kind: text
+  content: 'Slopes: never work on slopes steeper than 15 degrees, travel straight up or down, never across. After rain, check the ground before moving onto it.'
 quiz:
-  - {q: "When can you change the working mode?", options: ["Any time", "Only with both joysticks in neutral", "Only with the engine off"], answer_index: 1}
-  - {q: "The hydraulic temperature warning comes on at 97 °C. What do you do?", options: ["Keep digging in power mode", "Reduce load, switch to economy and idle", "Stop the engine immediately"], answer_index: 1}
-  - {q: "Maximum slope to work on?", options: ["15 degrees", "25 degrees", "35 degrees"], answer_index: 0}
-  - {q: "You will wait 10 minutes for a truck. What is best?", options: ["Keep the engine at high idle", "Stop the engine", "Leave auto-idle off"], answer_index: 1}
+- q: When can you change the working mode?
+  options:
+  - Any time
+  - Only with both joysticks in neutral
+  - Only with the engine off
+  answer_index: 1
+  explanation: The mode changes only when both joysticks are in neutral.
+  source: 4.2 Operating modes
+- q: The hydraulic temperature warning comes on at 97 °C. What do you do?
+  options:
+  - Keep digging in power mode
+  - Reduce load, switch to economy and idle
+  - Stop the engine immediately
+  answer_index: 1
+  explanation: Above 95 °C reduce the load, switch to economy mode and idle; stop work only above 105 °C.
+  source: 5.1 Hydraulic oil temperature warning
+- q: Maximum slope to work on?
+  options:
+  - 15 degrees
+  - 25 degrees
+  - 35 degrees
+  answer_index: 0
+  explanation: Do not work on slopes steeper than 15 degrees.
+  source: 4.6 Working on slopes
+- q: You will wait 10 minutes for a truck. What is best?
+  options:
+  - Keep the engine at high idle
+  - Stop the engine
+  - Leave auto-idle off
+  answer_index: 1
+  explanation: If the machine will be idle for more than 5 minutes, stop the engine.
+  source: 4.3 Auto-idle

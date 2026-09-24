@@ -3,13 +3,43 @@ machine_type: drill_rig
 level: intermediate
 title: Drilling technique and dust control
 duration_min: 35
+topics:
+- drilling
+- modes
+- dust
 steps:
-  - {kind: text, content: "This recap covers collaring, drilling modes and dust control."}
-  - {kind: text, content: "Collaring: start with low feed pressure and low percussion until the bit is about 30 cm into the rock, then switch to full drilling."}
-  - {kind: text, content: "Soft-rock mode uses lower percussion; hard-rock mode uses full percussion. Choose the mode before collaring — it can't change while percussion is on."}
-  - {kind: tip, content: "Watch the rotation pressure. A sudden rise means the bit is starting to stick."}
-  - {kind: text, content: "Keep the dust collector running while drilling. Dust escaping at the collar means a hose or the suction hood needs checking."}
+- kind: text
+  content: This recap covers collaring, drilling modes and dust control.
+- kind: text
+  content: 'Collaring: start with low feed pressure and low percussion until the bit is about 30 cm into the rock, then switch to full drilling.'
+- kind: text
+  content: Soft-rock mode uses lower percussion; hard-rock mode uses full percussion. Choose the mode before collaring — it can't change while percussion is on.
+- kind: tip
+  content: Watch the rotation pressure. A sudden rise means the bit is starting to stick.
+- kind: text
+  content: Keep the dust collector running while drilling. Dust escaping at the collar means a hose or the suction hood needs checking.
 quiz:
-  - {q: "How deep should the bit be before full drilling?", options: ["About 30 cm", "About 3 m", "Right away"], answer_index: 0}
-  - {q: "When do you choose soft-rock or hard-rock mode?", options: ["Before collaring", "Halfway down the hole", "After the hole is finished"], answer_index: 0}
-  - {q: "Rotation pressure suddenly rises. What does it mean?", options: ["The bit is starting to stick", "Fuel is low", "The mast is lowered"], answer_index: 0}
+- q: How deep should the bit be before full drilling?
+  options:
+  - About 30 cm
+  - About 3 m
+  - Right away
+  answer_index: 0
+  explanation: Collar with low feed and low percussion until the bit is about 30 cm into the rock.
+  source: 4.2 Collaring and drilling
+- q: When do you choose soft-rock or hard-rock mode?
+  options:
+  - Before collaring
+  - Halfway down the hole
+  - After the hole is finished
+  answer_index: 0
+  explanation: The mode can't be changed while percussion is on, so choose it before collaring.
+  source: 4.3 Drilling modes
+- q: Rotation pressure suddenly rises. What does it mean?
+  options:
+  - The bit is starting to stick
+  - Fuel is low
+  - The mast is lowered
+  answer_index: 0
+  explanation: A sudden rise in rotation pressure means the bit is getting stuck.
+  source: 4.2 Collaring and drilling

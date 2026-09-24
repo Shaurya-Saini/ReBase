@@ -3,14 +3,45 @@ machine_type: excavator
 level: expert
 title: Excavator refresher — lifting and emergencies
 duration_min: 30
+topics:
+- lifting
+- emergency
 steps:
-  - {kind: text, content: "A short refresher on lifting, emergencies and the habits that slip with experience."}
-  - {kind: text, content: "Lifting: select lifting mode (L), use only the approved lifting point, check the lift chart for your radius, keep the load low and swing slowly. Never lift over people."}
-  - {kind: text, content: "If the engine stops with the bucket raised: keep everyone clear, turn the key to ON without starting, pull the lock lever down and move the right joystick slowly forward. The boom lowers under its own weight."}
-  - {kind: tip, content: "Experienced operators get caught by familiarity: still check the swing area before every swing, and still wear the seatbelt for short moves."}
-  - {kind: text, content: "Fire: stop the engine, switch off the battery isolator and get out. Use the extinguisher only if it is safe."}
-  - {kind: text, content: "Coach others: if you see a novice swing near the ground crew or work across a slope, stop the job and talk it through."}
+- kind: text
+  content: A short refresher on lifting, emergencies and the habits that slip with experience.
+- kind: text
+  content: 'Lifting: select lifting mode (L), use only the approved lifting point, check the lift chart for your radius, keep the load low and swing slowly. Never lift over people.'
+- kind: text
+  content: 'If the engine stops with the bucket raised: keep everyone clear, turn the key to ON without starting, pull the lock lever down and move the right joystick slowly forward. The boom lowers under
+    its own weight.'
+- kind: tip
+  content: 'Experienced operators get caught by familiarity: still check the swing area before every swing, and still wear the seatbelt for short moves.'
+- kind: text
+  content: 'Fire: stop the engine, switch off the battery isolator and get out. Use the extinguisher only if it is safe.'
+- kind: text
+  content: 'Coach others: if you see a novice swing near the ground crew or work across a slope, stop the job and talk it through.'
 quiz:
-  - {q: "Which mode do you select before lifting?", options: ["Power (P)", "Economy (E)", "Lifting (L)"], answer_index: 2}
-  - {q: "The engine stopped with the bucket up. First step?", options: ["Keep everyone clear", "Restart and raise the boom", "Climb out and wait"], answer_index: 0}
-  - {q: "Where do you find the maximum load for your radius?", options: ["The fuel gauge", "The lift chart on the cab window", "The travel alarm"], answer_index: 1}
+- q: Which mode do you select before lifting?
+  options:
+  - Power (P)
+  - Economy (E)
+  - Lifting (L)
+  answer_index: 2
+  explanation: Lifting mode (L) gives slow, precise movements for lifting.
+  source: 4.5 Lifting objects
+- q: The engine stopped with the bucket up. First step?
+  options:
+  - Keep everyone clear
+  - Restart and raise the boom
+  - Climb out and wait
+  answer_index: 0
+  explanation: First keep everyone clear, then lower the boom using stored pressure.
+  source: 8.2 Lowering the boom with the engine stopped
+- q: Where do you find the maximum load for your radius?
+  options:
+  - The fuel gauge
+  - The lift chart on the cab window
+  - The travel alarm
+  answer_index: 1
+  explanation: The lift chart on the cab window gives the maximum load for your radius.
+  source: 4.5 Lifting objects

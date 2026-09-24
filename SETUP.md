@@ -171,7 +171,13 @@ All keys are optional — the demo runs with none. Speech-to-text and text-to-sp
 
 **LLM is optional and free.** Default `LLM_PROVIDER=gemini` (Google Gemini free tier, model `gemini-3.5-flash-lite`, falls back to `gemini-3.8-flash` when busy): get a key at https://aistudio.google.com/apikey and put it in `LLM_API_KEY`. `LLM_PROVIDER=anthropic` also works. **Fallback:** also set `GROQ_API_KEY` (free, console.groq.com) and any Gemini failure (overloaded, quota, timeout) is retried on Groq `openai/gpt-oss-120b` automatically. With no key, the briefing (E15) uses a built-in template with en/hi/ta phrases — the demo works fully without any LLM key.
 
-### 5.2 Re-train the estimator (after any re-seed)
+### 5.2 Training translations (only after editing `data/training/*.yaml`)
+```bash
+cd backend && python -m app.services.training_i18n   # translates new/changed modules to hi/ta with the LLM (needs a key); --force redoes all
+```
+The generated files in `data/i18n/training/` are committed, so the demo never needs a key for them. A string whose numbers change, or a module not in the right script, stays English.
+
+### 5.2b Re-train the estimator (after any re-seed)
 ```bash
 cd backend && python -m app.ai.train_estimator   # writes data/models/estimator.json
 ```

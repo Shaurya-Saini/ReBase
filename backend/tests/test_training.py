@@ -27,8 +27,11 @@ def test_every_machine_and_level_has_a_module(mtype, level):
 def test_contract_example_id():
     m = training.all_modules()["trn_ex_novice_01"]
     assert m["title"] == "Excavator basics before your shift"
-    assert m["quiz"][0] == {"q": "What must you do if a hydraulic hose leaks?",
-                            "options": ["Ignore it", "Report and do not start", "Start slowly"], "answer_index": 1}
+    q = m["quiz"][0]
+    assert {k: q[k] for k in ("q", "options", "answer_index")} == {
+        "q": "What must you do if a hydraulic hose leaks?",
+        "options": ["Ignore it", "Report and do not start", "Start slowly"], "answer_index": 1}
+    assert q["source"] == "6.1 Walk-around inspection" and q["explanation"]
 
 
 def test_quiz_agrees_with_the_manual():
@@ -69,8 +72,9 @@ def test_complete_records_result(client):
     r = client.post("/training/trn_ex_novice_01/complete", json={"operator_id": "op_003", "score": 3})
     assert r.status_code == 200 and r.json() == {"ok": True}
     with Session(engine) as db:
-        rows = db.exec(select(TrainingCompletion)).all()
-    assert [(c.operator_id, c.module_id, c.score) for c in rows] == [("op_003", "trn_ex_novice_01", 3)]
+        rows = db.exec(select(TrainingCompletion).where(TrainingCompletion.operator_id == "op_003",
+                                                        TrainingCompletion.module_id == "trn_ex_novice_01")).all()
+    assert [c.score for c in rows] == [3]
 
 
 def test_complete_errors(client):

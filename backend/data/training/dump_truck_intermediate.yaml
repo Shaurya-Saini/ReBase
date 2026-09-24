@@ -3,12 +3,42 @@ machine_type: dump_truck
 level: intermediate
 title: Hauling efficiently with the dump truck
 duration_min: 35
+topics:
+- unsafe_operation
+- overload
+- ramps
+- haul
 steps:
-  - {kind: text, content: "This recap covers loaded driving, gear hold on ramps and load limits."}
-  - {kind: text, content: "Loaded driving: keep a steady speed, don't exceed 15 km/h over 80 percent load on rough ground, slow down before bends."}
-  - {kind: text, content: "On a steep ramp, press the gear-hold button before starting down so the truck stays in a low gear."}
-  - {kind: tip, content: "The load indicator warns above 90 percent; above 100 percent ask the loader to take material off. An overloaded truck brakes poorly."}
+- kind: text
+  content: This recap covers loaded driving, gear hold on ramps and load limits.
+- kind: text
+  content: 'Loaded driving: keep a steady speed, don''t exceed 15 km/h over 80 percent load on rough ground, slow down before bends.'
+- kind: text
+  content: On a steep ramp, press the gear-hold button before starting down so the truck stays in a low gear.
+- kind: tip
+  content: The load indicator warns above 90 percent; above 100 percent ask the loader to take material off. An overloaded truck brakes poorly.
 quiz:
-  - {q: "Speed limit over 80 percent load on rough ground?", options: ["15 km/h", "30 km/h", "No limit"], answer_index: 0}
-  - {q: "When do you press gear hold?", options: ["Before starting down a steep ramp", "When parked", "At the tipping point"], answer_index: 0}
-  - {q: "The truck shows 103 percent load. What do you do?", options: ["Drive slowly", "Ask the loader to take material off", "Use power mode"], answer_index: 1}
+- q: Speed limit over 80 percent load on rough ground?
+  options:
+  - 15 km/h
+  - 30 km/h
+  - No limit
+  answer_index: 0
+  explanation: Don't exceed 15 km/h when more than 80 percent loaded on rough ground.
+  source: 4.2 Driving loaded
+- q: When do you press gear hold?
+  options:
+  - Before starting down a steep ramp
+  - When parked
+  - At the tipping point
+  answer_index: 0
+  explanation: Press gear hold before starting down a steep ramp.
+  source: 4.4 Operating modes
+- q: The truck shows 103 percent load. What do you do?
+  options:
+  - Drive slowly
+  - Ask the loader to take material off
+  - Use power mode
+  answer_index: 1
+  explanation: 'Above 100 percent is an overload: ask the loader to remove material.'
+  source: 5.2 Overload warning
