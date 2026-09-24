@@ -79,7 +79,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get checklist_title => 'Pre-start checklist';
 
   @override
-  String get checklist_complete_blocked => 'Fix critical defects before starting';
+  String get checklist_complete_blocked =>
+      'Fix critical defects before starting';
 
   @override
   String get briefing_title => 'Briefing';

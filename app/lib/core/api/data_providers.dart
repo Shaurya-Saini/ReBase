@@ -42,8 +42,12 @@ final briefingProvider = FutureProvider.autoDispose
     .family<Briefing, ({String sessionId, String lang})>((ref, a) =>
         ref.watch(apiClientProvider).briefing(a.sessionId, lang: a.lang));
 
-/// Next pre-shift training module for an operator + machine (A18, E26).
-final trainingModuleProvider = FutureProvider.autoDispose
-    .family<TrainingModule, ({String operatorId, String machineType})>((ref,
-            a) =>
-        ref.watch(apiClientProvider).nextTraining(a.operatorId, a.machineType));
+/// Personalized training plan for an operator (A18, E28).
+final trainingPlanProvider = FutureProvider.autoDispose
+    .family<TrainingPlan, String>((ref, operatorId) =>
+        ref.watch(apiClientProvider).trainingPlan(operatorId));
+
+/// A specific training module by id (A18, E29).
+final trainingModuleByIdProvider = FutureProvider.autoDispose
+    .family<TrainingModule, String>((ref, moduleId) =>
+        ref.watch(apiClientProvider).trainingModule(moduleId));

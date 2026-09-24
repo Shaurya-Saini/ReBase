@@ -26,7 +26,10 @@ GoRouter buildRouter() {
       GoRoute(path: '/dashboard', builder: (c, s) => const DashboardScreen()),
       GoRoute(
         path: '/job/:jobId',
-        builder: (c, s) => JobScreen(jobId: s.pathParameters['jobId']!),
+        builder: (c, s) => JobScreen(
+          jobId: s.pathParameters['jobId']!,
+          machineId: s.uri.queryParameters['machineId'],
+        ),
       ),
       GoRoute(
         path: '/session/:id/pre-start',

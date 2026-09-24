@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:app/core/api/api_error.dart';
 import 'package:app/core/api/data_providers.dart';
 import 'package:app/core/api/providers.dart';
 import 'package:app/core/models/models.dart';
@@ -60,8 +61,22 @@ class _PreStartScreenState extends ConsumerState<PreStartScreen> {
       _snack(t.checklist_answer_all);
       return;
     }
-    await ref.read(apiClientProvider).completeChecklist(widget.sessionId);
-    if (mounted) context.push('/session/${widget.sessionId}/briefing');
+    final api = ref.read(apiClientProvider);
+    try {
+      // Persist every status first so the backend's gate sees them (E13), then
+      // complete (E14).
+      for (final i in items) {
+        await api.updateChecklistItem(widget.sessionId, i.id,
+            status: _status[i.id]!);
+      }
+      await api.completeChecklist(widget.sessionId);
+      if (mounted) context.push('/session/${widget.sessionId}/briefing');
+    } catch (e) {
+      // 422 CRITICAL_DEFECT / CHECKLIST_INCOMPLETE, 409 INVALID_STATE, …
+      if (mounted) {
+        _snack(BackendError.from(e)?.message ?? 'Could not complete checklist');
+      }
+    }
   }
 
   @override

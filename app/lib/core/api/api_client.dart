@@ -55,4 +55,8 @@ abstract class ApiClient {
   Future<List<String>> simScenarios(); // E21 — demo control
   Future<void> triggerScenario(
       String sessionId, String event); // E22 — demo control
+  Future<TrainingPlan> trainingPlan(String operatorId); // E28
+  Future<TrainingModule> trainingModule(String moduleId); // E29
+  Future<QuizResult> submitQuiz(
+      String moduleId, String operatorId, List<int?> answers); // E30
 }

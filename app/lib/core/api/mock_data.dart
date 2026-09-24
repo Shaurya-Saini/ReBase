@@ -157,6 +157,57 @@ class MockData {
         ],
       );
 
+  static TrainingPlan trainingPlan(String operatorId) => TrainingPlan(
+        operatorId: operatorId,
+        date: '2026-09-24',
+        lang: 'en-IN',
+        totalMinutes: 45,
+        items: const [
+          PlanItem(
+            moduleId: 'trn_ex_novice_01',
+            title: 'Excavator basics before your shift',
+            machineType: 'excavator',
+            level: 'novice',
+            durationMin: 45,
+            priority: 1,
+            status: 'todo',
+            reasons: [
+              PlanReason(
+                  code: 'recent_alert',
+                  text: '2 seatbelt alert(s) in the last 7 days'),
+              PlanReason(
+                  code: 'job_hazard',
+                  text:
+                      'Hazard on your job: Overhead power line near east edge'),
+            ],
+            lastResult:
+                LastResult(score: 2, total: 4, at: '2026-09-22T02:30:00Z'),
+          ),
+        ],
+        progress: const TrainingProgress(
+            attempts: 3, modulesPassed: 2, avgScorePct: 83, streakDays: 3),
+      );
+
+  static QuizResult quizResult(String moduleId) => QuizResult(
+        moduleId: moduleId,
+        score: 3,
+        total: 4,
+        passed: true,
+        results: const [
+          QuestionResult(
+            index: 0,
+            chosen: 1,
+            correctIndex: 1,
+            correct: true,
+            explanation:
+                'A leaking hydraulic hose is a critical defect: report it and do not start until fixed.',
+            source: AnswerSource(
+                doc: 'excavator_manual.md',
+                section: '6.1 Walk-around inspection'),
+          ),
+        ],
+      );
+
   static AssistantAnswer answer1(String lang) => AssistantAnswer(
         answer:
             'Switch to power mode using the mode button on the right console.',

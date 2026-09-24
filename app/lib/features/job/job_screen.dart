@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:app/core/api/api_client.dart';
+import 'package:app/core/api/api_error.dart';
 import 'package:app/core/api/data_providers.dart';
 import 'package:app/core/api/providers.dart';
 import 'package:app/core/models/models.dart';
@@ -12,26 +13,31 @@ import 'package:app/ui/widgets/status_card.dart';
 
 /// A4 — job detail + XGBoost estimate, with "start session" (E7, E8, E10).
 class JobScreen extends ConsumerWidget {
-  const JobScreen({super.key, required this.jobId});
+  const JobScreen({super.key, required this.jobId, this.machineId});
 
   final String jobId;
+  final String? machineId; // from the assignment (E5); resolved by type if null
 
   Future<void> _start(BuildContext context, WidgetRef ref, Job job) async {
     final api = ref.read(apiClientProvider);
     final op = ref.read(selectedOperatorProvider);
     try {
-      final machines = await api.machines();
-      final machine = machines.firstWhere((m) => m.type == job.machineType,
-          orElse: () => machines.first);
+      var mId = machineId;
+      if (mId == null) {
+        final machines = await api.machines();
+        mId = machines
+            .firstWhere((m) => m.type == job.machineType,
+                orElse: () => machines.first)
+            .id;
+      }
       final session = await api.createSession(
         operatorId: op?.id ?? 'op_001',
-        machineId: machine.id,
+        machineId: mId,
         jobId: job.id,
       );
       if (context.mounted) context.push('/session/${session.id}/pre-start');
     } on SessionConflict catch (c) {
-      // A session is already open — resume it (demo: move in/out freely,
-      // no need to end it first).
+      // A session is already open — resume it (demo: move in/out freely).
       final id = c.existingSessionId;
       if (id == null) return;
       final s = await api.session(id);
@@ -41,6 +47,12 @@ class JobScreen extends ConsumerWidget {
         'briefing' => '/session/${s.id}/briefing',
         _ => '/session/${s.id}/pre-start',
       });
+    } catch (e) {
+      // Backend rejection (REST_REQUIRED, MACHINE_TYPE_MISMATCH, …).
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+              BackendError.from(e)?.message ?? 'Could not start session')));
     }
   }
 

@@ -169,4 +169,17 @@ class MockApiClient implements ApiClient {
   @override
   Future<void> triggerScenario(String sessionId, String event) =>
       _delay<void>(null);
+
+  @override
+  Future<TrainingPlan> trainingPlan(String operatorId) =>
+      _delay(MockData.trainingPlan(operatorId));
+
+  @override
+  Future<TrainingModule> trainingModule(String moduleId) =>
+      _delay(MockData.training1('excavator', 'novice'));
+
+  @override
+  Future<QuizResult> submitQuiz(
+          String moduleId, String operatorId, List<int?> answers) =>
+      _delay(MockData.quizResult(moduleId));
 }

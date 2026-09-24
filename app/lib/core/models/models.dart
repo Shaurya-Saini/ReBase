@@ -11,3 +11,4 @@ export 'operator.dart';
 export 'session.dart';
 export 'telemetry.dart';
 export 'training.dart';
+export 'training_plan.dart';

@@ -99,7 +99,8 @@ class DashboardScreen extends ConsumerWidget {
                                   subtitle: Text(
                                       '${a.job.site} · ${a.machine.model} · ${a.shift}'),
                                   trailing: const Icon(Icons.chevron_right),
-                                  onTap: () => context.push('/job/${a.job.id}'),
+                                  onTap: () => context.push(
+                                      '/job/${a.job.id}?machineId=${a.machine.id}'),
                                 ),
                               ))
                           .toList(),
