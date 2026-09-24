@@ -1,4 +1,4 @@
-# ReBase — API + Internal Contract (v2.1)
+# ReBase — API + Internal Contract (v2.2)
 
 Single source of truth between **Person A (Edge AI + UI)** and **Person B (Infra + Backend AI)**. Change only via the protocol in `CLAUDE.md` §6.
 A copies the JSON examples below into `app/assets/mock/` as mock fixtures. Since v2.1 the split is **A = the entire Flutter app, B = the entire backend**; the HTTP/WS contract (§3–§5) is the only interface between them. §6 lists the Flutter interfaces A builds.
@@ -18,6 +18,7 @@ A copies the JSON examples below into `app/assets/mock/` as mock fixtures. Since
 | Auth | None (hackathon). Operator picks their profile + 4-digit PIN (checked, not secure) |
 | Errors | `{"error": {"code": "SNAKE_UPPER_CODE", "message": "human readable"}}` with proper HTTP status |
 | Demo languages | `en-IN`, `hi-IN`, `ta-IN` (whole app switches). `te-IN` stays in the enum, stretch only. |
+| Display language (v2.2) | Endpoints that return display text accept an optional `?lang=<Lang>`; if absent, the `Accept-Language` header is used (`ta-IN`, `ta`, `hi-IN,hi;q=0.9` all work); default `en-IN`. Only human-readable strings are translated: operator `name`, machine `model`, job `title`/`site`, checklist section `title` + item `text`, estimate factor `note`, briefing (template path). **IDs, enums, numbers and all field names never change.** Applies to E2–E7, E8, E9, E12, E13 (E15 already takes `lang`). Missing translation → English. |
 
 ---
 
@@ -344,3 +345,4 @@ No cross-person imports — `backend/` is entirely B, `app/` is entirely A. A's 
 | v1.1 | M0 | A + B | Re-split: A = AI + UI, B = Infra. Added Owner column, §6 internal interfaces, `JobLog` model |
 | v2.0 | M0 | A + B | Edge re-architecture. Safety detection → tablet (A): ML Kit camera CV + telemetry rules; app POSTs alerts (new E18). WS = telemetry only. Checklists + Q&A + briefing → backend RAG (B). Estimator → XGBoost (B). STT → on-device (A); removed `/voice/stt`. Sarvam = TTS + translate proxy (B). Backend now entirely B; §6 meets only in Flutter. Demo langs en/hi/ta; no local cache. Endpoints renumbered E1–E27. |
 | v2.1 | M0 | B (pending A OK) | Ownership only, no API change: **whole Flutter app → A** (project setup, pubspec, main.dart, `core/` data layer + mock/HTTP/WS clients, mock fixtures, Training Hub screens). B = whole backend, no Flutter. E26/E27 caller → A app. §6 reworded accordingly. |
+| v2.2 | M4 | B (additive) | Display language: optional `?lang=` / `Accept-Language` on E2–E9, E12, E13 returns hand-translated hi/ta display strings (names, models, job titles/sites, checklist text, estimate notes). No shape changes; default en-IN. |
